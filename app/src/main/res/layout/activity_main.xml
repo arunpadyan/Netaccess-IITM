@@ -64,7 +64,18 @@
                         android:hint="LDAP Password"
                         android:inputType="textPassword" />
                 </android.support.design.widget.TextInputLayout>
-
+                <CheckBox
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/notifiation"
+                    android:layout_gravity="right"
+                    android:checked="true"
+                    android:text="Notification Login"
+                    android:textSize="16dp"
+                    android:layout_alignBottom="@+id/button_login"
+                    android:layout_alignRight="@+id/test"
+                    android:layout_alignEnd="@+id/test"
+                    android:layout_marginLeft="15dp"/>
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/button_login"
                     android:layout_width="wrap_content"
@@ -83,7 +94,9 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
-                    android:textSize="14dp" />
+                    android:textSize="14dp"
+                    android:autoLink="web"
+                    android:text="This ldap credentials won&apos;t be used any where else. Feel free to checkout source code  https://github.com/arunpadyan/netaccess-iitm" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/my_recycler_view"

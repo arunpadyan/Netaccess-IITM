@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -33,6 +34,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RemoteViews;
 import android.widget.TextView;
@@ -241,9 +243,57 @@ public class MainActivity extends ActionBarActivity {
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+        CheckBox Notifi = (CheckBox) findViewById(R.id.notifiation);
+        if(getBool("notifcation_login")){
+            Notifi.setChecked(false);
+        }
+
+        Notifi.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //is chkIos checked?
+                if (((CheckBox) v).isChecked()) {
+                    saveBool("notifcation_login", false);
+                } else {
+                    saveBool("notifcation_login", true);
+                }
+                NotificationChecker();
+
+
+            }
+        });
+    }
+    public void NotificationChecker(){
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        // if no network is available networkInfo will be null
+        // otherwise check if we are connected
+        if (networkInfo != null && networkInfo.isConnected()) {
+            if (!getBool("notifcation_login")&&getBool("have_name")){
+                createNotification(MyApplication.getContext());
+                Log.d("1","here");
+            }
+            else {
+                String ns = Context.NOTIFICATION_SERVICE;
+
+                NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
+                nMgr.cancel(1);
+            }
+            Log.d("connected", "fucker");
+            // Do your workateNotification();
+        }
+        else {
+            Log.d("disconnected","fucker");
+            String ns = Context.NOTIFICATION_SERVICE;
+
+            NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
+            nMgr.cancel(1);
+        }
+
+
 
     }
-
     /**
      * Gets the current registration ID for application on GCM service.
      * <p/>
@@ -389,7 +439,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
