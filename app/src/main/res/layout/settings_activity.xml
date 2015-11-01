@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/Base.ThemeOverlay.AppCompat.Dark">
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimaryDark" />
+
+    <CheckBox
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/notifiation"
+        android:layout_gravity="right"
+        android:layout_margin="10dp"
+        android:checked="true"
+        android:text="Notification Login"
+        android:textSize="16dp" />
+
+    <CheckBox
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Password"
+        android:id="@+id/save_password"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:checked="true"
+        android:textSize="16dp"
+        />
+
+</LinearLayout>

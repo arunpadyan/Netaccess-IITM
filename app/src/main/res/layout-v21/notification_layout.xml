@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/hy"
+    android:foregroundGravity="center_vertical">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_launcher_notif"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="9dp"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="NetAccess"
+        android:id="@+id/textView"
+        android:gravity="center_vertical"
+        android:textColor="#fd444444"
+        android:layout_marginLeft="8dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/imageButton"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:layout_marginBottom="5dp"
+            android:paddingBottom="5dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/refresh"
+            android:backgroundTint="#626167"
+            android:layout_gravity="center_vertical|right" />
+    </LinearLayout>
+
+</LinearLayout>

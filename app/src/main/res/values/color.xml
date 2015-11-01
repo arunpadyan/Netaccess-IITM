@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ff520c28</color>
+    <color name="colorPrimaryDark">#FF440C20</color>
+    <color name="colorPrimaryDark1">#ff00066b</color>
+
+    <color name="notification_settings_time_picker_bg_default">#fff</color>
+    <color name="notification_settings_time_picker_bg_pressed">#6633b5e5</color>
+    <!-- About -->
+    <color name="gplus_pressed">#563b5998</color>
+    <color name="email_pressed">#5a00c345</color>
+</resources>

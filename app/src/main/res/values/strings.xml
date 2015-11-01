@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <string name="app_name">Netaccess</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="error_config">Please set the %1$s constant and recompile the app.</string>
+    <string name="already_registered">Device is already registered on server.</string>
+    <string name="gcm_registered">From GCM: device successfully registered!</string>
+    <string name="gcm_unregistered">From GCM: device successfully unregistered!</string>
+    <string name="gcm_message">From GCM: you got message!</string>
+    <string name="gcm_error">From GCM: error (%1$s).</string>
+    <string name="gcm_recoverable_error">From GCM: recoverable error (%1$s).</string>
+    <string name="gcm_deleted">From GCM: server deleted %1$d pending messages!</string>
+    <string name="server_registering">Trying (attempt %1$d/%2$d) to register device on Demo Server.</string>
+    <string name="server_registered">From Demo Server: successfully added device!</string>
+    <string name="server_unregistered">From Demo Server: successfully removed device!</string>
+    <string name="server_register_error">Could not register device on Demo Server after %1$d attempts.</string>
+    <string name="server_unregister_error">Could not unregister device on Demo Server (%1$s).</string>
+    <string name="options_register">Register</string>
+    <string name="options_unregister">Unregister</string>
+    <string name="options_clear">Clear</string>
+    <string name="options_exit">Exit</string>
+    <string name="updatecheckurl">http://10.24.0.224/studentsapp/netaccess/</string>
+    <string name="updateurl">http://10.24.0.224/studentsapp/netaccess/app.apk</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5514295486090543/5696844510</string>
+    <string name="send_feedback_bug_report">Send feedback / bug report</string>
+    <string name="rate_on_play_store">Rate it on Play Store!</string>
+    <string name="the_app">THE APP</string>
+    <string name="the_dev">THE DEVELOPER</string>
+    <string name="special_thanks">SPECIAL THANKS</string>
+
+    <string name="saket">Arun Padiyan</string>
+    <string name="touch_know">Touch to know more</string>
+    <string name="email">Email</string>
+
+    <string name="about_main_messsage">Netaccess app let you put netaccess from notification drawer</string>
+    <string name="about_special_thanks_message">My buddy, <b>Aqel Ahammed</b> for his creative ideas and the beta testers for their feedback &amp; bug reports:
+    \n\n<li>Aravind Manoj</li>
+    \n<li>Arunjith</li>
+    \n<li>Arjun Prasannan</li>
+    \n<li>Aswin Rajeevan</li>
+    \n<li>Rouzif Rasheed</li>
+    </string>
+
+    <string name="hey_there">HEY THERE!</string>
+    <string name="dev_contact_message">I\'m an Android aficionado, a computer geek and a tech blogger. Connect with me:</string>
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <!-- "Mark Favorite", should appear as action button if possible -->
+        <item android:id="@+id/action_favorite" android:icon="@drawable/ic_favorite_black_48dp" android:title="@string/action_favorite" app:showAsAction="ifRoom" />
+
+        <!-- Settings, should always be in the overflow -->
+        <item android:id="@+id/action_settings" android:title="@string/action_settings" app:showAsAction="never" />
+
+    </menu>
+</resources>
