@@ -53,7 +53,6 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -90,7 +89,6 @@ public class MainActivity extends ActionBarActivity {
     TextView test;
     EditText rollno, ldap;
     Context context;
-    GoogleCloudMessaging gcm;
 
     String regid;
     private String TAG;
@@ -99,6 +97,7 @@ public class MainActivity extends ActionBarActivity {
     RecyclerView UsageRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
     // SwipeRefreshLayout mSwipeRefreshLayout;
+    static Tracker t;
 
     /**
      * @return Application's version code from the {@code PackageManager}.
@@ -219,7 +218,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         // Get tracker.
-        Tracker t = ((MyApplication) getApplication()).getTracker(
+        t = ((MyApplication) getApplication()).getTracker(
                 MyApplication.TrackerName.APP_TRACKER);
         t.setScreenName("main_activity");
         t.send(new HitBuilders.ScreenViewBuilder().build());
@@ -227,22 +226,11 @@ public class MainActivity extends ActionBarActivity {
 
         context = getApplicationContext();
         // Check device for Play Services APK.
-        if (checkPlayServices() && getBool("have_name")) {
-            // If this check succeeds, proceed with normal processing.
-            // Otherwise, prompt user to get valid Play Services APK.
-            gcm = GoogleCloudMessaging.getInstance(this);
-            regid = getRegistrationId(context);
 
-            if (regid.isEmpty()) {
-                registerInBackground();
-            }
-        } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
-        }
        // Updatecheck(this);
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        //AdView mAdView = (AdView) findViewById(R.id.adView);
+       // AdRequest adRequest = new AdRequest.Builder().build();
+       // mAdView.loadAd(adRequest);
         CheckBox Notifi = (CheckBox) findViewById(R.id.notifiation);
         if(getBool("notifcation_login")){
             Notifi.setChecked(false);
@@ -294,107 +282,8 @@ public class MainActivity extends ActionBarActivity {
 
 
     }
-    /**
-     * Gets the current registration ID for application on GCM service.
-     * <p/>
-     * If result is empty, the app needs to register.
-     *
-     * @return registration ID, or empty string if there is no existing
-     * registration ID.
-     */
-    private String getRegistrationId(Context context) {
-        final SharedPreferences prefs = getGCMPreferences(getBaseContext());
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-        if (registrationId.isEmpty()) {
-            Log.i(TAG, "Registration not found.");
-            return "";
-        }
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing registration ID is not guaranteed to work with
-        // the new app version.
-        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion(context);
-        if (registeredVersion != currentVersion) {
-            Log.i(TAG, "App version changed.");
-            return "";
-        }
-        return registrationId;
-    }
 
-    /**
-     * Registers the application with GCM servers asynchronously.
-     * <p/>
-     * Stores the registration ID and the app versionCode in the application's
-     * shared preferences.
-     */
-    private void registerInBackground() {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... paramso) {
-                String msg = "";
-                try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(context);
-                    }
-                    regid = gcm.register("");
-                    msg = "Device registered, registration ID=" + regid;
 
-                    // You should send the registration ID to your server over HTTP, so it
-                    // can use GCM/HTTP or CCS to send messages to your app.
-                    sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device will send
-                    // upstream messages to a server that echo back the message using the
-                    // 'from' address in the message.
-
-                    // Persist the regID - no need to register again.
-                    storeRegistrationId(context, regid);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
-                }
-                return msg;
-            }
-
-            @Override
-            protected void onPostExecute(String msg) {
-                //mDisplay.append(msg + "\n");
-            }
-        }.execute(null, null, null);
-    }
-
-    private void sendRegistrationIdToBackend() {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-        Log.d("", registrationId);
-        // Your implementation here.
-    }
-
-    private SharedPreferences getGCMPreferences(Context context) {
-        // This sample app persists the registration ID in shared preferences, but
-        // how you store the registration ID in your app is up to you.
-        return getSharedPreferences(MainActivity.class.getSimpleName(),
-                Context.MODE_PRIVATE);
-    }
-
-    /**
-     * Stores the registration ID and app versionCode in the application's
-     * {@code SharedPreferences}.
-     *
-     * @param context application's context.
-     * @param regId   registration ID
-     */
-    private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        int appVersion = getAppVersion(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PROPERTY_REG_ID, regId);
-        editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
-    }
 
     @Override
     protected void onStart() {
@@ -605,14 +494,23 @@ public class MainActivity extends ActionBarActivity {
             }
             if (loginform == null) {
                 toast = "you are not connected to insti network";
+                t.send(new HitBuilders.EventBuilder()
+                        .setCategory("Notification Login")
+                        .setAction("Fail")
+                        .build());
             } else {
                 Vibrator v = (Vibrator) MyApplication.getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(60);
 
                 toast = loginform.text();
+                t.send(new HitBuilders.EventBuilder()
+                        .setCategory("Notification Login")
+                        .setAction("Success")
+                        .build());
             }
             Toast.makeText(MyApplication.getContext(), toast,
                     Toast.LENGTH_SHORT).show();
+
             //new Approveve().execute();
         }
 
@@ -624,6 +522,10 @@ public class MainActivity extends ActionBarActivity {
             //cookieStore.removeAll();
             // Showing progress dialog
             ;
+            t.send(new HitBuilders.EventBuilder()
+                    .setCategory("Notification Login")
+                    .setAction("Hit")
+                    .build());
         }
 
         @Override
@@ -689,6 +591,8 @@ public class MainActivity extends ActionBarActivity {
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
+                    saveBool("Network_error", true);
+
                 }
                 try {
                     HttpUtility.sendPostRequest(requestURL2, params);
@@ -696,6 +600,8 @@ public class MainActivity extends ActionBarActivity {
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
+                    saveBool("Network_error", true);
+
                 }
                 HttpUtility.disconnect();
             } catch (Exception e) {
@@ -784,6 +690,10 @@ public class MainActivity extends ActionBarActivity {
                     saveString("rollno", rollno.getText().toString()); // Storing string
                     saveString("ldap", ldap.getText().toString());
                     saveBool("have_name", true);
+                    t.send(new HitBuilders.EventBuilder()
+                            .setCategory("Login")
+                            .setAction("Success")
+                            .build());
                 }
                 // Elements par = loginform.select("[p]");
 
@@ -795,6 +705,7 @@ public class MainActivity extends ActionBarActivity {
                 String date;
                 ArrayList<Usage> arrayList=new  ArrayList<Usage>();
                 try {
+
                     Element table = doc.select("table.table").get(0);
 
                     if(table!=null){
@@ -825,6 +736,10 @@ public class MainActivity extends ActionBarActivity {
 
             }
             if (getBool("Network_error")) {
+                t.send(new HitBuilders.EventBuilder()
+                        .setCategory("Login")
+                        .setAction("fail")
+                        .build());
                 Toast.makeText(getBaseContext(), "You are not connected to insti network",
                         Toast.LENGTH_SHORT).show();
                 saveBool("Network_error", false);
@@ -842,6 +757,10 @@ public class MainActivity extends ActionBarActivity {
             pDialog.setCancelable(false);
             // pDialog.show();
             //
+            t.send(new HitBuilders.EventBuilder()
+                    .setCategory("Login")
+                    .setAction("Hit")
+                    .build());
             final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
             if (!mSwipeRefreshLayout.isRefreshing()) {
                 mSwipeRefreshLayout.setRefreshing(true);
