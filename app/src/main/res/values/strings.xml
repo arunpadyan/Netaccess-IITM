@@ -55,4 +55,5 @@
         <item android:id="@+id/action_settings" android:title="@string/action_settings" app:showAsAction="never" />
 
     </menu>
+    <string name="invitation_message">Ever felt tired of having to log into netaccess site every now and then? The NetAccess App helps you login into netacess directly from the notification drawer </string>
 </resources>

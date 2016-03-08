@@ -51,8 +51,13 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -80,7 +85,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.net.ssl.HttpsURLConnection;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements
+        GoogleApiClient.OnConnectionFailedListener {
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -91,13 +97,16 @@ public class MainActivity extends ActionBarActivity {
     Context context;
 
     String regid;
-    private String TAG;
     static CookieManager cm = new CookieManager();
     boolean requstGoing = true;
     RecyclerView UsageRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
     // SwipeRefreshLayout mSwipeRefreshLayout;
     static Tracker t;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int REQUEST_INVITE = 0;
+
+    private GoogleApiClient mGoogleApiClient;
 
     /**
      * @return Application's version code from the {@code PackageManager}.
@@ -204,7 +213,7 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
 
 
-                if (requstGoing) new Login().execute();               //LoginNet();
+               if (requstGoing) new Login().execute();               //LoginNet();
                 // hideSoftKeyboard(MainActivity.this, v);
 
             }
@@ -251,6 +260,30 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+
+
+
+        //app invite
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(AppInvite.API)
+                .enableAutoManage(this, this)
+                .build();
+
+        // Check for App Invite invitations and launch deep-link activity if possible.
+        // Requires that an Activity is registered in AndroidManifest.xml to handle
+        // deep-link URLs.
+        boolean autoLaunchDeepLink = true;
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
+                .setResultCallback(
+                        new ResultCallback<AppInviteInvitationResult>() {
+                            @Override
+                            public void onResult(AppInviteInvitationResult result) {
+                                Log.d(TAG, "getInvitation:onResult:" + result.getStatus());
+                                // Because autoLaunchDeepLink = true we don't have to do anything
+                                // here, but we could set that to false and manually choose
+                                // an Activity to launch to handle the deep link here.
+                            }
+                        });
     }
     public void NotificationChecker(){
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -328,7 +361,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -341,7 +374,7 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+       /* if (id == R.id.action_settings) {
             Intent openNewActivity= new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(openNewActivity);
 
@@ -351,9 +384,41 @@ public class MainActivity extends ActionBarActivity {
             Intent openNewActivity= new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(openNewActivity);
 
+        }else*/ if(id == R.id.app_share){
+            Intent intent = new AppInviteInvitation.IntentBuilder("invite others to use this App")
+                    .setMessage("Since the NetAccess cups frequently these days ,this app is definitely a time saver for you")
+                    .setCallToActionText("invite others")
+                    .build();
+            startActivityForResult(intent, REQUEST_INVITE);
+
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                // Check how many invitations were sent and log a message
+                // The ids array contains the unique invitation ids for each invitation sent
+                // (one for each contact select by the user). You can use these for analytics
+                // as the ID will be consistent on the sending and receiving devices.
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                //Log.d(TAG, getString(R.string.sent_invitations_fmt, ids.length));
+            } else {
+                // Sending failed or it was canceled, show failure message to the user
+               // showMessage(getString(R.string.send_failed));
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+       // showMessage(getString(R.string.google_play_services_error));
     }
 
     public void saveString(String key, String value) {
@@ -494,19 +559,22 @@ public class MainActivity extends ActionBarActivity {
             }
             if (loginform == null) {
                 toast = "you are not connected to insti network";
-                t.send(new HitBuilders.EventBuilder()
+              /*  t.send(new HitBuilders.EventBuilder()
                         .setCategory("Notification Login")
                         .setAction("Fail")
-                        .build());
-            } else {
+                        .build());*/
+            }else if (300 <loginform.text().length()) {
+               toast="wrong password ";
+            }
+            else {
                 Vibrator v = (Vibrator) MyApplication.getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(60);
 
                 toast = loginform.text();
-                t.send(new HitBuilders.EventBuilder()
+                /*t.send(new HitBuilders.EventBuilder()
                         .setCategory("Notification Login")
                         .setAction("Success")
-                        .build());
+                        .build());*/
             }
             Toast.makeText(MyApplication.getContext(), toast,
                     Toast.LENGTH_SHORT).show();
@@ -522,10 +590,10 @@ public class MainActivity extends ActionBarActivity {
             //cookieStore.removeAll();
             // Showing progress dialog
             ;
-            t.send(new HitBuilders.EventBuilder()
+           /* t.send(new HitBuilders.EventBuilder()
                     .setCategory("Notification Login")
                     .setAction("Hit")
-                    .build());
+                    .build());*/
         }
 
         @Override
@@ -680,7 +748,7 @@ public class MainActivity extends ActionBarActivity {
                     saveString("rollno", rollno.getText().toString()); // Storing string
                     saveString("ldap", ldap.getText().toString());
                     saveBool("have_name", true);
-                    createNotification(MainActivity.this);
+                    if (!getBool("notifcation_login")) createNotification(MainActivity.this);
                 }
                 if (300 <loginform.text().length()) {
                     test.setTextColor(Color.RED);
