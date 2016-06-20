@@ -27,7 +27,7 @@
             android:value="@integer/google_play_services_version" />
 
         <receiver android:name=".MainActivity$switchButtonListener" />
-        <receiver android:name=".MainActivity$WifiReceiver">
+        <receiver android:name=".MyApplication$WifiReceiver">
             <intent-filter android:priority="100">
                 <action android:name="android.net.wifi.STATE_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />

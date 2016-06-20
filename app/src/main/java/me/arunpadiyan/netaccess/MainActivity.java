@@ -107,6 +107,7 @@ public class MainActivity extends ActionBarActivity implements
     boolean requstGoing = true;
     RecyclerView UsageRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    MyApplication mApp ;
     // SwipeRefreshLayout mSwipeRefreshLayout;
     static Tracker t;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -186,10 +187,9 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        mApp =(MyApplication) getApplicationContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new NukeSSLCerts().nuke();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         CookieHandler.setDefault(cm);
@@ -221,7 +221,7 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //  if (requstGoing) new Login().execute();               //LoginNet();
                 // hideSoftKeyboard(MainActivity.this, v);
-                NewFirewallAuth();
+               mApp. NewFirewallAuth();
             }
         });
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -441,27 +441,7 @@ public class MainActivity extends ActionBarActivity implements
 
     }
 
-    private void LogOut() {
 
-        String requestURL1;
-        requestURL1 = "https://netaccess.iitm.ac.in/account/logout";
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, requestURL1,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Log.d("respons",response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Log.d("server error", error.toString());
-
-            }
-        });
-        queue.add(stringRequest);
-
-    }
 
     private static class LoginNotif extends AsyncTask<String, String, String> {
         String responseBody;
@@ -502,43 +482,6 @@ public class MainActivity extends ActionBarActivity implements
             } catch (Exception e) {
                 Log.d("", e.getLocalizedMessage());
             }
-           /* HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("https://netaccess.iitm.ac.in/account/login");
-            HttpPost httppostapp = new HttpPost("https://netaccess.iitm.ac.in/account/approve");
-
-
-            try {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("userPassword", getprefString("ldap", MyApplication.getContext())));
-                nameValuePairs.add(new BasicNameValuePair("userLogin", getprefString("rollno", MyApplication.getContext())));
-                Log.d("dfg", getprefString("ldap", MyApplication.getContext()));
-                List<NameValuePair> nameValuePairsap = new ArrayList<NameValuePair>(2);
-                nameValuePairsap.add(new BasicNameValuePair("duration", "1"));
-                nameValuePairsap.add(new BasicNameValuePair("approveBtn", null));
-
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                httppostapp.setEntity(new UrlEncodedFormEntity(nameValuePairsap));
-
-
-                // Execute HTTP Post Request
-                HttpResponse responseLogin = httpclient.execute(httppost);
-                HttpResponse response = httpclient.execute(httppostapp);
-                try {
-                    responseBody = EntityUtils.toString(response.getEntity());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-
-                    Log.i("Parse Exception", e + "");
-                }
-            } catch (ClientProtocolException e) {
-
-                // TODO Auto-generated catch block
-            } catch (IOException e) {
-
-                // TODO Auto-generated catch block
-            }
-*/
 
             return responseBody;
         }
@@ -549,12 +492,6 @@ public class MainActivity extends ActionBarActivity implements
             String toast;
 
             if (responseBody != null) {
-
-
-                // Elements par = loginform.select("[p]");
-
-                // String name = doc.attr(".alert-success");
-
                 Document doc = Jsoup.parse(responseBody);
                 loginform = doc.select("div.alert-success").first();
                 if (loginform == null) {
@@ -563,10 +500,7 @@ public class MainActivity extends ActionBarActivity implements
             }
             if (loginform == null) {
                 toast = "you are not connected to insti network";
-              /*  t.send(new HitBuilders.EventBuilder()
-                        .setCategory("Notification Login")
-                        .setAction("Fail")
-                        .build());*/
+
             } else if (300 < loginform.text().length()) {
                 toast = "wrong password ";
             } else {
@@ -574,15 +508,11 @@ public class MainActivity extends ActionBarActivity implements
                 v.vibrate(60);
 
                 toast = loginform.text();
-                /*t.send(new HitBuilders.EventBuilder()
-                        .setCategory("Notification Login")
-                        .setAction("Success")
-                        .build());*/
+
             }
             Toast.makeText(MyApplication.getContext(), toast,
                     Toast.LENGTH_SHORT).show();
 
-            //new Approveve().execute();
         }
 
         @Override
@@ -590,13 +520,7 @@ public class MainActivity extends ActionBarActivity implements
             super.onPreExecute();
             CookieHandler.setDefault(cm);
             CookieStore cookieStore = cm.getCookieStore();
-            //cookieStore.removeAll();
-            // Showing progress dialog
-            ;
-           /* t.send(new HitBuilders.EventBuilder()
-                    .setCategory("Notification Login")
-                    .setAction("Hit")
-                    .build());*/
+
         }
 
         @Override
@@ -605,184 +529,10 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    public static class WifiReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("sad", "sad");
-
-            NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-            if (info != null) {
-                if (info.isConnected()) {
-
-
-                    if (!getBool("notifcation_login")) {
-                        createNotification(context);
-
-                    }
-                    Log.d("connected", "fucker");
-                    // Do your workateNotification();
-                    // e.g. To check the Network Name or other info:
-                    //WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
-                    // WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                    // String ssid = wifiInfo.getSSID();
-                } else {
-                    Log.d("disconnected", "fucker");
-                    String ns = Context.NOTIFICATION_SERVICE;
-
-                    NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
-                    nMgr.cancel(1);
-                }
-            }
-        }
-    }
-
-    private void NewFirewallAuth() {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "http://connectivitycheck.gstatic.com/generate_204";
-        //HttpURLConnection.setFollowRedirects(true);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("MainActivity", response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                NetworkResponse response = error.networkResponse;
-                int mStatusCode = response.statusCode;
-                String parsed;
-                try {
-                    parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-
-
-                } catch (UnsupportedEncodingException e) {
-                    parsed = new String(response.data);
-                }
-                Document doc = Jsoup.parse(parsed);
-                Elements links = doc.select("a[href]");
-                Log.d("MainActivity", links.get(0).attr("href"));
-                getMagic(links.get(0).attr("href"));
-
-                Log.d("MainActivity", "Data :" + parsed);
-                Log.d("MainActivity", "ResponseCode :" + Integer.toString(mStatusCode));
-                //mTextView.setText("That didn't work!");
-
-            }
-        }) {
-            @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                if (response != null) {
-                    int mStatusCode = response.statusCode;
-                    String parsed;
-                    try {
-                        parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                    } catch (UnsupportedEncodingException e) {
-                        parsed = new String(response.data);
-                    }
-                    Log.d("MainActivity", "Data :" + parsed);
-                    Log.d("MainActivity", "ResponseCode :" + Integer.toString(mStatusCode));
-                }
-                return super.parseNetworkResponse(response);
-            }
-        };
-// Add the request to the RequestQueue.
-        queue.add(stringRequest);
-    }
 
 
 
-    private void getMagic(final String url) {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        final String[] magic = {""};
 
-       // HttpURLConnection.setFollowRedirects(true);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("MainActivity getMagic", "here");
-
-                        Log.d("MainActivity getMagic", getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response));
-                        magic[0] = getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response);
-                        NewFirewallAuthLogin(url,magic[0]);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                NetworkResponse response = error.networkResponse;
-                Log.d("MainActivity", " getMagic error :" +error.toString());
-                // Log.d("Main Activity",response);
-            }
-        });
-// Add the request to the RequestQueue.
-        queue.add(stringRequest);
-    }
-
-    private String getRegexString(String patern,String string){
-        Pattern p = Pattern.compile(patern);
-        Matcher m = p.matcher(string);
-        if(m.find())
-            return m.group(1);
-
-        return "";
-    }
-
-    public void NewFirewallAuthLogin(final String AuthLink,final String magic) {
-
-       // new NukeSSLCerts().nuke();
-
-       // HttpsTrustManager.allowAllSSL();
-        String  tag_string_req = "string_req";
-        String url = "https://nfw.iitm.ac.in:1003/";
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("MainActivity", response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                NetworkResponse response = error.networkResponse;
-                Log.d("MainActivity",error.toString());
-              //  int mStatusCode = response.statusCode;
-                /*String parsed;
-                try {
-                    parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                } catch (UnsupportedEncodingException e) {
-                    parsed = new String(response.data);
-                }*/
-            }
-        }) {
-
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("username", "ch13b010");
-                params.put("password", "Kannan!123");
-                params.put("4Tredir", "http://connectivitycheck.gstatic.com/generate_204");
-                params.put("magic",magic);
-
-                return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36");
-                params.put("Referer", AuthLink);
-
-                return params;
-            }
-
-        };
-        queue.add(stringRequest);
-
-    }
 
 
     private class Login extends AsyncTask<String, String, String> {
@@ -995,118 +745,7 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    private void LoginNet() {
 
-        String requestURL1, requestURL2;
-        requestURL1 = "https://netaccess.iitm.ac.in/account/login";
-        requestURL2 = "https://netaccess.iitm.ac.in/account/approve";
-        final RequestQueue queue = Volley.newRequestQueue(this);
-        final StringRequest stringRequest2 = new StringRequest(Request.Method.POST, requestURL2,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("respons", response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("server error", error.toString());
-
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("userPassword", ldap.getText().toString());
-                params.put("userLogin", rollno.getText().toString());
-                params.put("duration", "1");
-                params.put("approveBtn", "");
-                return params;
-            }
-        };
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, requestURL1,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Log.d("respons",response);
-                        queue.add(stringRequest2);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Log.d("server error", error.toString());
-
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("userPassword", ldap.getText().toString());
-                params.put("userLogin", rollno.getText().toString());
-                params.put("thirdParam", "1");
-                params.put("thirdParam", "");
-                return params;
-            }
-        };
-
-        queue.add(stringRequest);
-
-
-    }
-
-
-    public void Updatecheck(final Context context) {
-
-        String url = getString(R.string.updatecheckurl) + "update.php";
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("success", "fuck this");
-
-                        response = response.replaceAll("\\s", "");
-                        if (response.equals("1")) {
-                            new AlertDialog.Builder(MainActivity.this)
-                                    .setTitle("Update")
-                                    .setMessage("New vertion of Netaccess app is available.Do you want to Download")
-                                    .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int whichButton) {
-                                                    openWebPage(getString(R.string.updateurl));
-                                                    dialog.cancel();
-                                                }
-                                            }
-
-                                    )
-                                    .setNegativeButton("no", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            dialogInterface.cancel();
-
-                                        }
-                                    })
-                                    .show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("server error", error.toString());
-
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("appversion", Integer.toString(getAppVersion(context)));
-                return params;
-            }
-        };
-        queue.add(stringRequest);
-
-    }
 
     public void openWebPage(String url) {
         Uri webpage = Uri.parse(url);
@@ -1116,37 +755,6 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    private String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while ((line = bufferedReader.readLine()) != null) {
-            result += line;
-        }
 
-            /* Close Stream */
-        if (null != inputStream) {
-            inputStream.close();
-        }
-        return result;
-    }
-
-    private String getQuery(List<Pair<String, String>> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-
-        for (Pair pair : params) {
-            if (first)
-                first = false;
-            else
-                result.append("&");
-
-            result.append(URLEncoder.encode((String) pair.first, "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode((String) pair.second, "UTF-8"));
-        }
-
-        return result.toString();
-    }
 
 }
