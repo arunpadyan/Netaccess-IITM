@@ -40,10 +40,13 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdRequest;
@@ -74,6 +77,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookieStore;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -81,6 +85,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -183,6 +189,7 @@ public class MainActivity extends ActionBarActivity implements
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        new NukeSSLCerts().nuke();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         CookieHandler.setDefault(cm);
@@ -208,14 +215,13 @@ public class MainActivity extends ActionBarActivity implements
         ldap.setText(getprefString("ldap", this));
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         approve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-               if (requstGoing) new Login().execute();               //LoginNet();
+                //  if (requstGoing) new Login().execute();               //LoginNet();
                 // hideSoftKeyboard(MainActivity.this, v);
-
+                NewFirewallAuth();
             }
         });
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -236,12 +242,12 @@ public class MainActivity extends ActionBarActivity implements
         context = getApplicationContext();
         // Check device for Play Services APK.
 
-       // Updatecheck(this);
+        // Updatecheck(this);
         //AdView mAdView = (AdView) findViewById(R.id.adView);
-       // AdRequest adRequest = new AdRequest.Builder().build();
-       // mAdView.loadAd(adRequest);
+        // AdRequest adRequest = new AdRequest.Builder().build();
+        // mAdView.loadAd(adRequest);
         CheckBox Notifi = (CheckBox) findViewById(R.id.notifiation);
-        if(getBool("notifcation_login")){
+        if (getBool("notifcation_login")) {
             Notifi.setChecked(false);
         }
 
@@ -260,7 +266,6 @@ public class MainActivity extends ActionBarActivity implements
 
             }
         });
-
 
 
         //app invite
@@ -285,17 +290,17 @@ public class MainActivity extends ActionBarActivity implements
                             }
                         });
     }
-    public void NotificationChecker(){
+
+    public void NotificationChecker() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         // if no network is available networkInfo will be null
         // otherwise check if we are connected
         if (networkInfo != null && networkInfo.isConnected()) {
-            if (!getBool("notifcation_login")&&getBool("have_name")){
+            if (!getBool("notifcation_login") && getBool("have_name")) {
                 createNotification(MyApplication.getContext());
-                Log.d("1","here");
-            }
-            else {
+                Log.d("1", "here");
+            } else {
                 String ns = Context.NOTIFICATION_SERVICE;
 
                 NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
@@ -303,9 +308,8 @@ public class MainActivity extends ActionBarActivity implements
             }
             Log.d("connected", "fucker");
             // Do your workateNotification();
-        }
-        else {
-            Log.d("disconnected","fucker");
+        } else {
+            Log.d("disconnected", "fucker");
             String ns = Context.NOTIFICATION_SERVICE;
 
             NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
@@ -313,9 +317,7 @@ public class MainActivity extends ActionBarActivity implements
         }
 
 
-
     }
-
 
 
     @Override
@@ -384,7 +386,8 @@ public class MainActivity extends ActionBarActivity implements
             Intent openNewActivity= new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(openNewActivity);
 
-        }else*/ if(id == R.id.app_share){
+        }else*/
+        if (id == R.id.app_share) {
             Intent intent = new AppInviteInvitation.IntentBuilder("invite others to use this App")
                     .setMessage("Since the NetAccess cups frequently these days ,this app is definitely a time saver for you")
                     .setCallToActionText("invite others")
@@ -395,6 +398,7 @@ public class MainActivity extends ActionBarActivity implements
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -410,7 +414,7 @@ public class MainActivity extends ActionBarActivity implements
                 //Log.d(TAG, getString(R.string.sent_invitations_fmt, ids.length));
             } else {
                 // Sending failed or it was canceled, show failure message to the user
-               // showMessage(getString(R.string.send_failed));
+                // showMessage(getString(R.string.send_failed));
             }
         }
     }
@@ -418,7 +422,7 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
-       // showMessage(getString(R.string.google_play_services_error));
+        // showMessage(getString(R.string.google_play_services_error));
     }
 
     public void saveString(String key, String value) {
@@ -563,10 +567,9 @@ public class MainActivity extends ActionBarActivity implements
                         .setCategory("Notification Login")
                         .setAction("Fail")
                         .build());*/
-            }else if (300 <loginform.text().length()) {
-               toast="wrong password ";
-            }
-            else {
+            } else if (300 < loginform.text().length()) {
+                toast = "wrong password ";
+            } else {
                 Vibrator v = (Vibrator) MyApplication.getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(60);
 
@@ -632,6 +635,155 @@ public class MainActivity extends ActionBarActivity implements
             }
         }
     }
+
+    private void NewFirewallAuth() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://connectivitycheck.gstatic.com/generate_204";
+        //HttpURLConnection.setFollowRedirects(true);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("MainActivity", response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse response = error.networkResponse;
+                int mStatusCode = response.statusCode;
+                String parsed;
+                try {
+                    parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+
+
+                } catch (UnsupportedEncodingException e) {
+                    parsed = new String(response.data);
+                }
+                Document doc = Jsoup.parse(parsed);
+                Elements links = doc.select("a[href]");
+                Log.d("MainActivity", links.get(0).attr("href"));
+                getMagic(links.get(0).attr("href"));
+
+                Log.d("MainActivity", "Data :" + parsed);
+                Log.d("MainActivity", "ResponseCode :" + Integer.toString(mStatusCode));
+                //mTextView.setText("That didn't work!");
+
+            }
+        }) {
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                if (response != null) {
+                    int mStatusCode = response.statusCode;
+                    String parsed;
+                    try {
+                        parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                    } catch (UnsupportedEncodingException e) {
+                        parsed = new String(response.data);
+                    }
+                    Log.d("MainActivity", "Data :" + parsed);
+                    Log.d("MainActivity", "ResponseCode :" + Integer.toString(mStatusCode));
+                }
+                return super.parseNetworkResponse(response);
+            }
+        };
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
+
+
+    private void getMagic(final String url) {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        final String[] magic = {""};
+
+       // HttpURLConnection.setFollowRedirects(true);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("MainActivity getMagic", "here");
+
+                        Log.d("MainActivity getMagic", getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response));
+                        magic[0] = getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response);
+                        NewFirewallAuthLogin(url,magic[0]);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse response = error.networkResponse;
+                Log.d("MainActivity", " getMagic error :" +error.toString());
+                // Log.d("Main Activity",response);
+            }
+        });
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
+    private String getRegexString(String patern,String string){
+        Pattern p = Pattern.compile(patern);
+        Matcher m = p.matcher(string);
+        if(m.find())
+            return m.group(1);
+
+        return "";
+    }
+
+    public void NewFirewallAuthLogin(final String AuthLink,final String magic) {
+
+       // new NukeSSLCerts().nuke();
+
+       // HttpsTrustManager.allowAllSSL();
+        String  tag_string_req = "string_req";
+        String url = "https://nfw.iitm.ac.in:1003/";
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("MainActivity", response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse response = error.networkResponse;
+                Log.d("MainActivity",error.toString());
+              //  int mStatusCode = response.statusCode;
+                /*String parsed;
+                try {
+                    parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                } catch (UnsupportedEncodingException e) {
+                    parsed = new String(response.data);
+                }*/
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("username", "ch13b010");
+                params.put("password", "Kannan!123");
+                params.put("4Tredir", "http://connectivitycheck.gstatic.com/generate_204");
+                params.put("magic",magic);
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36");
+                params.put("Referer", AuthLink);
+
+                return params;
+            }
+
+        };
+        queue.add(stringRequest);
+
+    }
+
 
     private class Login extends AsyncTask<String, String, String> {
         String responseBody;
@@ -740,7 +892,7 @@ public class MainActivity extends ActionBarActivity implements
                     loginform = doc.select("div.alert-info").first();
                     test.setTextColor(Color.RED);
                 }
-                if (loginform==null) {
+                if (loginform == null) {
                     test.setTextColor(Color.RED);
                     test.setText("wrong password ");
                 } else {
@@ -750,7 +902,7 @@ public class MainActivity extends ActionBarActivity implements
                     saveBool("have_name", true);
                     if (!getBool("notifcation_login")) createNotification(MainActivity.this);
                 }
-                if (300 <loginform.text().length()) {
+                if (300 < loginform.text().length()) {
                     test.setTextColor(Color.RED);
                     test.setText("wrong password ");
                 } else {
@@ -771,34 +923,34 @@ public class MainActivity extends ActionBarActivity implements
                 String ip;
                 boolean active;
                 String date;
-                ArrayList<Usage> arrayList=new  ArrayList<Usage>();
+                ArrayList<Usage> arrayList = new ArrayList<Usage>();
                 try {
 
                     Element table = doc.select("table.table").get(0);
 
-                    if(table!=null){
+                    if (table != null) {
                         Elements rows = table.select("tr");
                         for (int i = 1; i < rows.size(); i++) {
-                            Elements data=  rows.get(i).select("td");
+                            Elements data = rows.get(i).select("td");
                             /*Log.d("---------------------------------------------------------",data.get(1).text());
                             Log.d("ip",data.get(1).text());
                             Log.d("date", data.get(2).text());
                             Log.d("usage",data.get(3).text());*/
-                            usage=data.get(3).text();
-                            ip=data.get(1).text();
-                            date=data.get(2).text();
-                            active =(rows.get(i).select("span.label-success").first()!=null);
+                            usage = data.get(3).text();
+                            ip = data.get(1).text();
+                            date = data.get(2).text();
+                            active = (rows.get(i).select("span.label-success").first() != null);
                             if (active)
-                                link="https://netaccess.iitm.ac.in" + rows.get(i).select("a[href]").first().attr("href");
-                            else link="";
-                            Usage test =new Usage(ip,usage,date,link,active);
+                                link = "https://netaccess.iitm.ac.in" + rows.get(i).select("a[href]").first().attr("href");
+                            else link = "";
+                            Usage test = new Usage(ip, usage, date, link, active);
                             arrayList.add(test);
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                UsageRecyclerAdapter adapter =new UsageRecyclerAdapter(MainActivity.this,arrayList,mSwipeRefreshLayout);
+                UsageRecyclerAdapter adapter = new UsageRecyclerAdapter(MainActivity.this, arrayList, mSwipeRefreshLayout);
                 UsageRecyclerView.setAdapter(adapter);
 
 
