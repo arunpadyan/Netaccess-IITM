@@ -1,0 +1,74 @@
+{
+  "project_info": {
+    "project_number": "138715041450",
+    "firebase_url": "https://thematic-cider-91705.firebaseio.com",
+    "project_id": "thematic-cider-91705",
+    "storage_bucket": "thematic-cider-91705.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138715041450:android:4f39df5300c7a7cb",
+        "android_client_info": {
+          "package_name": "me.arunpadiyan.netaccess"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "138715041450-a1gehgtsqungdp0brarcha9uio75k0vk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.arunpadiyan.netaccess",
+            "certificate_hash": "AEFF3196C146ECE0AB087874BE1659907E21E90E"
+          }
+        },
+        {
+          "client_id": "138715041450-mgguemurepdi892v6u0b845rdjs978dv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.arunpadiyan.netaccess",
+            "certificate_hash": "69921389CBEEB10950E1CB9F9341953209B7BB1D"
+          }
+        },
+        {
+          "client_id": "138715041450-jgea0ik9ddkr9a4pp74bm8d6ftht30b1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.arunpadiyan.netaccess",
+            "certificate_hash": "DF1008862B9B01B441CDCD6104B4E6DB34D065CF"
+          }
+        },
+        {
+          "client_id": "138715041450-58rqrno4mti2c8rsut4ak16v119putl4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzIoV8I8GU0jAwx9q1KY58YxvdwgbLPrI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-61389535-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "138715041450-58rqrno4mti2c8rsut4ak16v119putl4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

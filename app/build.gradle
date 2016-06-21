@@ -1,16 +1,17 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 24
+    buildToolsVersion '23.0.3'
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "me.arunpadiyan.netaccess"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 15
-        versionName "1.3.3"
+        versionCode 16
+        versionName "1.4"
     }
     buildTypes {
         release {
@@ -22,14 +23,19 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:support-v4:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
 
-    compile 'com.google.android.gms:play-services-analytics:9.0.2'
-    compile 'com.google.android.gms:play-services-ads:9.0.2'
-    compile 'com.google.android.gms:play-services-appinvite:9.0.2'
+
+    def final playServicesVersion = '9.0.2'
+
+    compile "com.google.firebase:firebase-core:${playServicesVersion}"
+    compile "com.google.firebase:firebase-ads:${playServicesVersion}"
+    compile "com.google.firebase:firebase-invites:${playServicesVersion}"
+    compile "com.google.firebase:firebase-crash:${playServicesVersion}"
+    compile "com.google.firebase:firebase-messaging:${playServicesVersion}"
 
     compile 'com.google.code.gson:gson:2.7'
     compile 'org.jsoup:jsoup:1.7.3'

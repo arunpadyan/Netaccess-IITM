@@ -1,13 +1,11 @@
 package me.arunpadiyan.netaccess;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -16,11 +14,9 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,7 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -40,20 +35,13 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.appinvite.AppInviteInvitationResult;
@@ -61,34 +49,21 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-
-
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookieStore;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.net.ssl.HttpsURLConnection;
 
 
 public class MainActivity extends ActionBarActivity implements
@@ -97,23 +72,22 @@ public class MainActivity extends ActionBarActivity implements
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int REQUEST_INVITE = 0;
+    static CookieManager cm = new CookieManager();
+    // SwipeRefreshLayout mSwipeRefreshLayout;
+  //  static Tracker t;
     ProgressDialog pDialog;
     TextView test;
     EditText rollno, ldap;
     Context context;
-
     String regid;
-    static CookieManager cm = new CookieManager();
     boolean requstGoing = true;
     RecyclerView UsageRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    MyApplication mApp ;
-    // SwipeRefreshLayout mSwipeRefreshLayout;
-    static Tracker t;
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int REQUEST_INVITE = 0;
-
+    MyApplication mApp;
     private GoogleApiClient mGoogleApiClient;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     /**
      * @return Application's version code from the {@code PackageManager}.
@@ -130,26 +104,6 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
-    public static String getprefString(String key, Context cont) {
-        SharedPreferences pref = cont.getSharedPreferences("MyPref", 1); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        return pref.getString(key, "");
-    }
-
-    public static void saveBool(String key, Boolean value) {
-        SharedPreferences pref = MyApplication.getContext().getSharedPreferences("MyPref", 1); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
-
-    }
-
-    public static Boolean getBool(String key) {
-        SharedPreferences pref = MyApplication.getContext().getSharedPreferences("MyPref", 1); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
-        return pref.getBoolean(key, false);
-
-    }
 
     public static void hideSoftKeyboard(ActionBarActivity activity, View view) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -187,9 +141,11 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mApp =(MyApplication) getApplicationContext();
+        mApp = (MyApplication) getApplicationContext();
         super.onCreate(savedInstanceState);
+        context = this;
         setContentView(R.layout.activity_main);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         CookieHandler.setDefault(cm);
@@ -210,46 +166,62 @@ public class MainActivity extends ActionBarActivity implements
         rollno = (EditText) findViewById(R.id.edit_text_rollno);
         ldap = (EditText) findViewById(R.id.edit_text__pass);
         Button approve = (Button) findViewById(R.id.button_login);
+        Button logout = (Button) findViewById(R.id.button_logout);
 
-        rollno.setText(getprefString("rollno", this));
-        ldap.setText(getprefString("ldap", this));
+        rollno.setText(Utils.getprefString(mApp.USER_NAME, this));
+        ldap.setText(Utils.getprefString(mApp.LDAP_PASSWORD, this));
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         approve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //  if (requstGoing) new Login().execute();               //LoginNet();
-                // hideSoftKeyboard(MainActivity.this, v);
-               mApp. NewFirewallAuth();
+                 if (requstGoing) new Login().execute();
+
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AuthLogOut();
             }
         });
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if (requstGoing) new Login().execute();
-                //LoginNet();
 
             }
         });
-        // Get tracker.
-        t = ((MyApplication) getApplication()).getTracker(
-                MyApplication.TrackerName.APP_TRACKER);
-        t.setScreenName("main_activity");
-        t.send(new HitBuilders.ScreenViewBuilder().build());
-        // createNotification(MyApplication.getContext());
 
-        context = getApplicationContext();
-        // Check device for Play Services APK.
-
-        // Updatecheck(this);
-        //AdView mAdView = (AdView) findViewById(R.id.adView);
-        // AdRequest adRequest = new AdRequest.Builder().build();
-        // mAdView.loadAd(adRequest);
         CheckBox Notifi = (CheckBox) findViewById(R.id.notifiation);
-        if (getBool("notifcation_login")) {
+        CheckBox cbService = (CheckBox) findViewById(R.id.service);
+
+        if (Utils.getprefBool("notifcation_login",context)) {
             Notifi.setChecked(false);
+
         }
+        if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+            Notifi.setChecked(true);
+           // context.startService(new Intent(context, AuthService.class));
+
+        }
+        cbService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //is chkIos checked?
+                if (((CheckBox) v).isChecked()) {
+                    context.startService(new Intent(context, AuthService.class));
+                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true,context);
+                } else {
+                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, false,context);
+                    context.stopService(new Intent(context, AuthService.class));
+                }
+                NotificationChecker();
+
+
+            }
+        });
 
         Notifi.setOnClickListener(new View.OnClickListener() {
 
@@ -257,9 +229,9 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                    saveBool("notifcation_login", false);
+                    Utils.saveprefBool("notifcation_login", false,context);
                 } else {
-                    saveBool("notifcation_login", true);
+                    Utils.saveprefBool("notifcation_login", true,context);
                 }
                 NotificationChecker();
 
@@ -289,6 +261,32 @@ public class MainActivity extends ActionBarActivity implements
                                 // an Activity to launch to handle the deep link here.
                             }
                         });
+        Log.d("MainActivity",Utils.getCertificateSHA1Fingerprint(this));
+    }
+    private void AuthLogOut( ) {
+        final String url =Utils.getprefString(MyApplication.LOG_OUT,this);
+        final String function = "AuthLogOut" ;
+        final String[] magic = {""};
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.d(TAG ,function+" :response :"+response);
+                        Toast.makeText(context,"Logout successful",Toast.LENGTH_SHORT).show();
+                      //  getMagic(url);
+                      /*  Log.d("MainActivity getMagic", getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response));
+                        magic[0] = getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response);
+                        NewFirewallAuthLogin(url,magic[0]);*/
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse response = error.networkResponse;
+                Log.d("MainActivity", " getMagic error :" +error.toString());
+            }
+        });
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 
     public void NotificationChecker() {
@@ -297,7 +295,7 @@ public class MainActivity extends ActionBarActivity implements
         // if no network is available networkInfo will be null
         // otherwise check if we are connected
         if (networkInfo != null && networkInfo.isConnected()) {
-            if (!getBool("notifcation_login") && getBool("have_name")) {
+            if (!Utils.getprefBool("notifcation_login",context) && Utils.getprefBool(mApp.VALID_PASS,context)) {
                 createNotification(MyApplication.getContext());
                 Log.d("1", "here");
             } else {
@@ -324,14 +322,14 @@ public class MainActivity extends ActionBarActivity implements
     protected void onStart() {
         // TODO Auto-generated method stub
         super.onStart();
-        GoogleAnalytics.getInstance(MainActivity.this).reportActivityStart(this);
+        //GoogleAnalytics.getInstance(MainActivity.this).reportActivityStart(this);
     }
 
     @Override
     protected void onStop() {
         // TODO Auto-generated method stub
         super.onStop();
-        GoogleAnalytics.getInstance(MainActivity.this).reportActivityStop(this);
+       // GoogleAnalytics.getInstance(MainActivity.this).reportActivityStop(this);
     }
 
     @Override
@@ -390,7 +388,7 @@ public class MainActivity extends ActionBarActivity implements
         if (id == R.id.app_share) {
             Intent intent = new AppInviteInvitation.IntentBuilder("invite others to use this App")
                     .setMessage("Since the NetAccess cups frequently these days ,this app is definitely a time saver for you")
-                    .setCallToActionText("invite others")
+                    .setCallToActionText("Install NetAccess App")
                     .build();
             startActivityForResult(intent, REQUEST_INVITE);
 
@@ -432,6 +430,14 @@ public class MainActivity extends ActionBarActivity implements
         editor.commit();
     }
 
+    public void openWebPage(String url) {
+        Uri webpage = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
     public static class switchButtonListener extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -440,8 +446,6 @@ public class MainActivity extends ActionBarActivity implements
         }
 
     }
-
-
 
     private static class LoginNotif extends AsyncTask<String, String, String> {
         String responseBody;
@@ -459,8 +463,8 @@ public class MainActivity extends ActionBarActivity implements
                 Map<String, String> params = new HashMap<String, String>();
                 requestURL1 = "https://netaccess.iitm.ac.in/account/login";
                 requestURL2 = "https://netaccess.iitm.ac.in/account/approve";
-                params.put("userPassword", getprefString("ldap", MyApplication.getContext()));
-                params.put("userLogin", getprefString("rollno", MyApplication.getContext()));
+                params.put("userPassword", Utils.getprefString(MyApplication.LDAP_PASSWORD, MyApplication.getContext()));
+                params.put("userLogin", Utils.getprefString(MyApplication.USER_NAME, MyApplication.getContext()));
                 params.put("duration", "1");
                 params.put("approveBtn", "");
 
@@ -507,6 +511,15 @@ public class MainActivity extends ActionBarActivity implements
                 Vibrator v = (Vibrator) MyApplication.getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(60);
 
+                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,MyApplication.getContext())) {
+                    MyApplication.getContext().startService(new Intent(MyApplication.getContext(), AuthService.class));
+                }
+                FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(MyApplication.getContext());
+                Bundle params = new Bundle();
+                params.putString("Activity", "MainActivity");
+                params.putString("Function", "Login");
+                params.putString("result", "success");
+                mFirebaseAnalytics.logEvent("log", params);
                 toast = loginform.text();
 
             }
@@ -528,12 +541,6 @@ public class MainActivity extends ActionBarActivity implements
 
         }
     }
-
-
-
-
-
-
 
     private class Login extends AsyncTask<String, String, String> {
         String responseBody;
@@ -561,7 +568,7 @@ public class MainActivity extends ActionBarActivity implements
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    saveBool("Network_error", true);
+                    Utils.saveprefBool("Network_error", true,context);
 
                 }
                 try {
@@ -570,50 +577,13 @@ public class MainActivity extends ActionBarActivity implements
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    saveBool("Network_error", true);
+                    Utils.saveprefBool("Network_error", true,context);
 
                 }
                 HttpUtility.disconnect();
             } catch (Exception e) {
                 Log.d(TAG, e.getLocalizedMessage());
             }
-
-            /*try {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("userPassword", ldap.getText().toString()));
-                nameValuePairs.add(new BasicNameValuePair("userLogin", rollno.getText().toString()));
-
-                List<NameValuePair> nameValuePairsap = new ArrayList<NameValuePair>(2);
-                nameValuePairsap.add(new BasicNameValuePair("duration", "1"));
-                nameValuePairsap.add(new BasicNameValuePair("approveBtn", null));
-
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                httppostapp.setEntity(new UrlEncodedFormEntity(nameValuePairsap));
-
-
-                // Execute HTTP Post Request
-                HttpResponse responseLogin = httpclient.execute(httppost);
-                HttpResponse response = httpclient.execute(httppostapp);
-                Log.d("Parse Exception", "" + "");
-
-
-                try {
-                    responseBody = EntityUtils.toString(response.getEntity());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-
-                    Log.d("Parse Exception", e + "");
-                }
-            } catch (ClientProtocolException e) {
-                saveBool("Network_error", true);
-
-                // TODO Auto-generated catch block
-            } catch (IOException e) {
-                saveBool("Network_error", true);
-
-                // TODO Auto-generated catch block
-            }*/
 
 
             return responseBody;
@@ -647,23 +617,39 @@ public class MainActivity extends ActionBarActivity implements
                     test.setText("wrong password ");
                 } else {
                     test.setText(loginform.text());
-                    saveString("rollno", rollno.getText().toString()); // Storing string
-                    saveString("ldap", ldap.getText().toString());
-                    saveBool("have_name", true);
-                    if (!getBool("notifcation_login")) createNotification(MainActivity.this);
+                    saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
+                    saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
+                    Utils.saveprefBool(mApp.VALID_PASS, true,context);
+                    if (!Utils.getprefBool("notifcation_login",context)) createNotification(MainActivity.this);
+                   // context.startService(new Intent(context, AuthService.class));
+
                 }
                 if (300 < loginform.text().length()) {
                     test.setTextColor(Color.RED);
                     test.setText("wrong password ");
                 } else {
                     test.setText(loginform.text());
-                    saveString("rollno", rollno.getText().toString()); // Storing string
-                    saveString("ldap", ldap.getText().toString());
-                    saveBool("have_name", true);
-                    t.send(new HitBuilders.EventBuilder()
+                    saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
+                    saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
+                    Utils.saveprefBool(mApp.VALID_PASS, true,context);
+                    Bundle params = new Bundle();
+
+                  //  mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+
+                    params.putString("Activity", "MainActivity");
+                    params.putString("Function", "Login");
+                    params.putString("result", "success");
+                    mFirebaseAnalytics.logEvent("log", params);
+                    /*t.send(new HitBuilders.EventBuilder()
                             .setCategory("Login")
                             .setAction("Success")
-                            .build());
+                            .build());*/
+
+                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                        params.putString("Activity", "MainActivity");
+
+                        context.startService(new Intent(context, AuthService.class));
+                    }
                 }
                 // Elements par = loginform.select("[p]");
 
@@ -705,14 +691,14 @@ public class MainActivity extends ActionBarActivity implements
 
 
             }
-            if (getBool("Network_error")) {
-                t.send(new HitBuilders.EventBuilder()
+            if (Utils.getprefBool("Network_error",context)) {
+               /* t.send(new HitBuilders.EventBuilder()
                         .setCategory("Login")
                         .setAction("fail")
-                        .build());
+                        .build());*/
                 Toast.makeText(getBaseContext(), "You are not connected to insti network",
                         Toast.LENGTH_SHORT).show();
-                saveBool("Network_error", false);
+                Utils.getprefBool("Network_error",context);
             }
             //new Approveve().execute();
         }
@@ -727,10 +713,10 @@ public class MainActivity extends ActionBarActivity implements
             pDialog.setCancelable(false);
             // pDialog.show();
             //
-            t.send(new HitBuilders.EventBuilder()
+          /*  t.send(new HitBuilders.EventBuilder()
                     .setCategory("Login")
                     .setAction("Hit")
-                    .build());
+                    .build());*/
             final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
             if (!mSwipeRefreshLayout.isRefreshing()) {
                 mSwipeRefreshLayout.setRefreshing(true);
@@ -744,17 +730,6 @@ public class MainActivity extends ActionBarActivity implements
 
         }
     }
-
-
-
-    public void openWebPage(String url) {
-        Uri webpage = Uri.parse(url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
 
 
 }

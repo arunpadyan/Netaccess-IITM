@@ -72,31 +72,51 @@
                     android:checked="true"
                     android:text="Notification Login"
                     android:textSize="16dp"
+                    android:layout_below="@+id/service"
+                    android:layout_alignLeft="@+id/service"
+                    android:layout_alignStart="@+id/service" />
+                <CheckBox
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/service"
+                    android:layout_gravity="right"
+                    android:checked="true"
+                    android:text="Firewall Login"
+                    android:textSize="16dp"
                     android:layout_alignBottom="@+id/button_login"
                     android:layout_alignRight="@+id/test"
                     android:layout_alignEnd="@+id/test"
                     android:layout_marginLeft="15dp"/>
                 <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                    android:backgroundTint="#993000"
+                android:text="Logout"
+                    android:layout_below="@+id/button_login"
+                    android:layout_alignLeft="@+id/button_login"
+                    android:layout_alignStart="@+id/button_login" />
+                <android.support.v7.widget.AppCompatButton
                     android:id="@+id/button_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_below="@+id/password_text_input_layout"
                     android:backgroundTint="#009900"
-                    android:text="Login" />
+                    android:text="Login"
+                    android:layout_below="@+id/password_text_input_layout"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
 
                 <TextView
                     android:id="@+id/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/button_login"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginTop="8dp"
                     android:textSize="14dp"
                     android:autoLink="web"
-                    android:text="This ldap credentials won&apos;t be used any where else. Feel free to checkout source code  https://github.com/arunpadyan/netaccess-iitm" />
+                    android:text="This ldap credentials won&apos;t be used any where else. Feel free to checkout source code  https://github.com/arunpadyan/netaccess-iitm"
+                    android:visibility="visible"
+                    android:layout_below="@+id/button_logout"
+                    android:layout_alignRight="@+id/button_logout"
+                    android:layout_alignEnd="@+id/button_logout" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/my_recycler_view"

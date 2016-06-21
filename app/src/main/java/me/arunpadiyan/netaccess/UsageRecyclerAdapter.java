@@ -124,8 +124,8 @@ public class UsageRecyclerAdapter extends RecyclerView.Adapter<UsageRecyclerAdap
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("userPassword", MainActivity.getprefString("ldap", MyApplication.getContext()));
-                params.put("userLogin", MainActivity.getprefString("rollno", MyApplication.getContext()));
+                params.put("userPassword", Utils.getprefString(MyApplication.USER_NAME, MyApplication.getContext()));
+                params.put("userLogin", Utils.getprefString(MyApplication.LDAP_PASSWORD, MyApplication.getContext()));
                 return params;
             }
         };
