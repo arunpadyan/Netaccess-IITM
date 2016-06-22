@@ -143,6 +143,12 @@ public class MainActivity extends ActionBarActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         mApp = (MyApplication) getApplicationContext();
         super.onCreate(savedInstanceState);
+
+        if(!Utils.getprefBool("first_time_login",this)){
+            Utils.saveprefBool(MyApplication.SERVICE_ENABLED,true,this);
+            Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
+            Utils.saveprefBool("first_time_login",true,this);
+        }
         context = this;
         setContentView(R.layout.activity_main);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -176,7 +182,14 @@ public class MainActivity extends ActionBarActivity implements
         approve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 if (requstGoing) new Login().execute();
+                if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
+                    if (requstGoing) new Login().execute();
+                }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
+                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                        ((MyApplication) getApplicationContext()).stopAuthService();
+                        ((MyApplication) getApplicationContext()).startAuthService();
+                    }
+                }
 
             }
         });
@@ -196,16 +209,12 @@ public class MainActivity extends ActionBarActivity implements
 
         CheckBox Notifi = (CheckBox) findViewById(R.id.notifiation);
         CheckBox cbService = (CheckBox) findViewById(R.id.service);
+        CheckBox cbNetAccess = (CheckBox) findViewById(R.id.netacces);
 
-        if (Utils.getprefBool("notifcation_login",context)) {
-            Notifi.setChecked(false);
+        Notifi.setChecked(!Utils.getprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED,context));
+        cbService.setChecked(Utils.getprefBool(MyApplication.SERVICE_ENABLED,context));
+        cbNetAccess.setChecked(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context));
 
-        }
-        if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-            Notifi.setChecked(true);
-           // context.startService(new Intent(context, AuthService.class));
-
-        }
         cbService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -219,8 +228,6 @@ public class MainActivity extends ActionBarActivity implements
                     ((MyApplication) getApplicationContext()).stopAuthService();
                 }
                 NotificationChecker();
-
-
             }
         });
 
@@ -230,13 +237,25 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                    Utils.saveprefBool("notifcation_login", false,context);
+                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, false,context);
                 } else {
-                    Utils.saveprefBool("notifcation_login", true,context);
+                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, true,context);
                 }
                 NotificationChecker();
+            }
+        });
 
+        cbNetAccess.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                //is chkIos checked?
+                if (((CheckBox) v).isChecked()) {
+                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, true,context);
+                } else {
+                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, false,context);
+                }
+              //  NotificationChecker();
             }
         });
 
@@ -268,6 +287,7 @@ public class MainActivity extends ActionBarActivity implements
         final String url =Utils.getprefString(MyApplication.LOG_OUT,this);
         final String function = "AuthLogOut" ;
         final String[] magic = {""};
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -276,6 +296,10 @@ public class MainActivity extends ActionBarActivity implements
 
                         Log.d(TAG ,function+" :response :"+response);
                         Toast.makeText(context,"Logout successful",Toast.LENGTH_SHORT).show();
+                        Bundle params = new Bundle();
+                        params.putString("result", "success");
+                        params.putString("context", "MainActivity");
+                        mFirebaseAnalytics.logEvent("Logout", params);
                       //  getMagic(url);
                       /*  Log.d("MainActivity getMagic", getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response));
                         magic[0] = getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response);
@@ -284,6 +308,11 @@ public class MainActivity extends ActionBarActivity implements
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Bundle params = new Bundle();
+
+                params.putString("result", "failed");
+                params.putString("context", "MainActivity");
+                mFirebaseAnalytics.logEvent("Logout", params);
                 NetworkResponse response = error.networkResponse;
                 Log.d("MainActivity", " getMagic error :" +error.toString());
             }
@@ -390,7 +419,7 @@ public class MainActivity extends ActionBarActivity implements
         if (id == R.id.app_share) {
             Intent intent = new AppInviteInvitation.IntentBuilder("invite others to use this App")
                     .setMessage("Since the NetAccess cups frequently these days ,this app is definitely a time saver for you")
-                    .setCallToActionText("Install NetAccess App")
+                    .setCallToActionText("Install")
                     .build();
             startActivityForResult(intent, REQUEST_INVITE);
 
@@ -444,7 +473,14 @@ public class MainActivity extends ActionBarActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("TAG", "test");
-            new LoginNotif().execute();
+            if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
+                new LoginNotif().execute();
+            }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
+                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                    ((MyApplication) context.getApplicationContext()).stopAuthService();
+                    ((MyApplication) context.getApplicationContext()).startAuthService();
+                }
+            }
         }
 
     }
@@ -520,10 +556,8 @@ public class MainActivity extends ActionBarActivity implements
                 }
                 FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(MyApplication.getContext());
                 Bundle params = new Bundle();
-                params.putString("Activity", "MainActivity");
-                params.putString("Function", "Login");
                 params.putString("result", "success");
-                mFirebaseAnalytics.logEvent("log", params);
+                mFirebaseAnalytics.logEvent("Notification_Login", params);
                 toast = loginform.text();
 
             }
@@ -619,6 +653,9 @@ public class MainActivity extends ActionBarActivity implements
                 if (loginform == null) {
                     test.setTextColor(Color.RED);
                     test.setText("wrong password ");
+                    Bundle params = new Bundle();
+                    params.putString("result", "wrong password");
+                    mFirebaseAnalytics.logEvent("MainActivity_Login", params);
                 } else {
                     test.setText(loginform.text());
                     saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
@@ -637,13 +674,10 @@ public class MainActivity extends ActionBarActivity implements
                     saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
                     Utils.saveprefBool(mApp.VALID_PASS, true,context);
                     Bundle params = new Bundle();
-
                   //  mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
-                    params.putString("Activity", "MainActivity");
-                    params.putString("Function", "Login");
                     params.putString("result", "success");
-                    mFirebaseAnalytics.logEvent("log", params);
+                    mFirebaseAnalytics.logEvent("MainActivity_Login", params);
                     /*t.send(new HitBuilders.EventBuilder()
                             .setCategory("Login")
                             .setAction("Success")
@@ -702,7 +736,7 @@ public class MainActivity extends ActionBarActivity implements
                         .build());*/
                 Toast.makeText(getBaseContext(), "You are not connected to insti network",
                         Toast.LENGTH_SHORT).show();
-                Utils.getprefBool("Network_error",context);
+                Utils.saveprefBool("Network_error",false,context );
             }
             //new Approveve().execute();
         }

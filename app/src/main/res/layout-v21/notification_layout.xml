@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:id="@+id/hy"
     android:foregroundGravity="center_vertical">
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
+    <RelativeLayout
+        android:layout_width="40dp"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_launcher_notif"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="9dp"
-        android:layout_marginBottom="20dp" />
+        android:layout_height="40dp"
+        android:background="@drawable/notification_icon_bg"
+        android:layout_marginLeft="8dp">
+        <ImageView
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:id="@+id/imageView"
+            android:src="@drawable/ic_launcher_notif"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:tint="@android:color/white" />
+
+
+    </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,7 +30,7 @@
         android:id="@+id/textView"
         android:gravity="center_vertical"
         android:textColor="#fd444444"
-        android:layout_marginLeft="8dp" />
+        android:layout_marginLeft="14dp" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -33,17 +40,16 @@
         android:gravity="center_vertical">
 
         <ImageButton
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/imageButton"
-            android:layout_margin="5dp"
             android:padding="5dp"
-            android:layout_marginBottom="5dp"
             android:paddingBottom="5dp"
             android:scaleType="centerCrop"
             android:background="@drawable/refresh"
             android:backgroundTint="#626167"
-            android:layout_gravity="center_vertical|right" />
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="8dp" />
     </LinearLayout>
 
 </LinearLayout>

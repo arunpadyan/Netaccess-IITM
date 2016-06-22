@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -42,8 +43,11 @@ public class MyApplication extends Application {
     public static final String LOG_OUT = "log_out";
     public static final String VALID_PASS = "valid_pass";
     public static final String SERVICE_ENABLED = "service_enabled";
+    public static final String NETACCESS_LOGIN  = "NETACCESS_LOGIN_ENABLED";
+
     public static final String NOTIFICATION_LOGIN_ENABLED = "notifcation_login";
 
+    private Typeface mFontCabinRegular = null;
 
     public static boolean thredActive = false;
     RequestQueue queue;
@@ -53,13 +57,15 @@ public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         if (!FirebaseApp.getApps(this).isEmpty()) {
             //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         }
-        super.onCreate();
         instance = this;
         new NukeSSLCerts().nuke();
         mContext = this;
+
 
     }
 
@@ -155,6 +161,12 @@ public class MyApplication extends Application {
         }
     }
 
+    public Typeface getFjordOneRegular() {
+        if (mFontCabinRegular == null) {
+            mFontCabinRegular = Typeface.createFromAsset(this.getAssets(), "fonts/Montserrat-Regular.otf");
+        }
+        return mFontCabinRegular;
+    }
 
 
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ro1"
+    <item android:drawable="@drawable/r1"
         android:state_pressed="true" />
-    <item android:drawable="@drawable/ro2"
+    <item android:drawable="@drawable/r2"
         android:state_focused="true" />
-    <item android:drawable="@drawable/ro3" />
+    <item android:drawable="@drawable/r3" />
 </selector>

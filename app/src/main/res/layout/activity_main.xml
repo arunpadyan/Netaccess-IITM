@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Base.ThemeOverlay.AppCompat.Dark"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,7 +31,8 @@
                 android:paddingBottom="10dp"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin">
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:gravity="center_horizontal">
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/username_text_input_layout"
@@ -83,10 +86,20 @@
                     android:checked="true"
                     android:text="Firewall Login"
                     android:textSize="16dp"
-                    android:layout_alignBottom="@+id/button_login"
-                    android:layout_alignRight="@+id/test"
-                    android:layout_alignEnd="@+id/test"
-                    android:layout_marginLeft="15dp"/>
+                    android:layout_below="@+id/netacces"
+                    android:layout_alignRight="@+id/button_logout"
+                    android:layout_alignEnd="@+id/button_logout" />
+                <CheckBox
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/netacces"
+                    android:layout_gravity="right"
+                    android:checked="true"
+                    android:text="Netaccess Login"
+                    android:textSize="16dp"
+                    android:layout_below="@+id/password_text_input_layout"
+                    android:layout_alignLeft="@+id/service"
+                    android:layout_alignStart="@+id/service" />
                 <android.support.v7.widget.AppCompatButton
                 android:id="@+id/button_logout"
                 android:layout_width="wrap_content"
@@ -106,7 +119,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true" />
 
-                <TextView
+                <me.arunpadiyan.netaccess.NATextView
                     android:id="@+id/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -114,9 +127,10 @@
                     android:autoLink="web"
                     android:text="This ldap credentials won&apos;t be used any where else. Feel free to checkout source code  https://github.com/arunpadyan/netaccess-iitm"
                     android:visibility="visible"
-                    android:layout_below="@+id/button_logout"
-                    android:layout_alignRight="@+id/button_logout"
-                    android:layout_alignEnd="@+id/button_logout" />
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/notifiation"
+                    android:layout_centerHorizontal="true"
+                    app:fontName = "fjord"/>
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/my_recycler_view"

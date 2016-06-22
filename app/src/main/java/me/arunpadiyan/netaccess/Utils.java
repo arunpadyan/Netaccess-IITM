@@ -22,6 +22,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 public class Utils {
+    public static final int FONT_NORMAL_REGULAR = 0x00;
+    public static final int FONT_FJORD_REGULAR = 0x01;
     public static void saveprefString(String key, String value, Context context) {
         SharedPreferences pref = context.getSharedPreferences("MyPref", 1); // 0 - for private mode
         SharedPreferences.Editor editor = pref.edit();

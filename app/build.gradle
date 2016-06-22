@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "me.arunpadiyan.netaccess"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 21
         versionCode 16
-        versionName "1.4"
+        versionName "1.4.1"
     }
     buildTypes {
         release {
