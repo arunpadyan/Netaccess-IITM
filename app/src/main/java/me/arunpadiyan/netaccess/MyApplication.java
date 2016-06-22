@@ -63,6 +63,16 @@ public class MyApplication extends Application {
 
     }
 
+    public void startAuthService(){
+        startService(new Intent(this, AuthService.class));
+
+    }
+
+    public void stopAuthService(){
+        stopService(new Intent(this, AuthService.class));
+
+    }
+
     public static android.content.Context getContext() {
         return instance.getApplicationContext();
     }
@@ -132,11 +142,11 @@ public class MyApplication extends Application {
                 if(Utils.getprefBool("network",context)){
                     Log.d(TAG, "connected");
                     if(Utils.getprefBool(VALID_PASS,context) && Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)){
-                        context.startService(new Intent(context, AuthService.class));
+                        ((MyApplication) context.getApplicationContext()).startAuthService();
                     }
                 }else {
                     Log.d(TAG, "disconnected");
-                    context.stopService(new Intent(context, AuthService.class));
+                    ((MyApplication) context.getApplicationContext()).stopAuthService();
                 }
 
             } catch (Exception e) {

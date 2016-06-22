@@ -211,11 +211,12 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                    context.startService(new Intent(context, AuthService.class));
+                    ((MyApplication) getApplicationContext()).stopAuthService();
+                    ((MyApplication) getApplicationContext()).startAuthService();
                     Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true,context);
                 } else {
                     Utils.saveprefBool(MyApplication.SERVICE_ENABLED, false,context);
-                    context.stopService(new Intent(context, AuthService.class));
+                    ((MyApplication) getApplicationContext()).stopAuthService();
                 }
                 NotificationChecker();
 
@@ -271,6 +272,7 @@ public class MainActivity extends ActionBarActivity implements
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        ((MyApplication) getApplicationContext()).stopAuthService();
 
                         Log.d(TAG ,function+" :response :"+response);
                         Toast.makeText(context,"Logout successful",Toast.LENGTH_SHORT).show();
@@ -512,7 +514,9 @@ public class MainActivity extends ActionBarActivity implements
                 v.vibrate(60);
 
                 if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,MyApplication.getContext())) {
-                    MyApplication.getContext().startService(new Intent(MyApplication.getContext(), AuthService.class));
+                    ((MyApplication) MyApplication.getContext()).stopAuthService();
+                    ((MyApplication) MyApplication.getContext()).startAuthService();
+
                 }
                 FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(MyApplication.getContext());
                 Bundle params = new Bundle();
@@ -621,7 +625,7 @@ public class MainActivity extends ActionBarActivity implements
                     saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
                     Utils.saveprefBool(mApp.VALID_PASS, true,context);
                     if (!Utils.getprefBool("notifcation_login",context)) createNotification(MainActivity.this);
-                   // context.startService(new Intent(context, AuthService.class));
+                   // context.stopvice(new Intent(context, AuthService.class));
 
                 }
                 if (300 < loginform.text().length()) {
@@ -647,8 +651,8 @@ public class MainActivity extends ActionBarActivity implements
 
                     if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
                         params.putString("Activity", "MainActivity");
-
-                        context.startService(new Intent(context, AuthService.class));
+                        ((MyApplication) getApplicationContext()).stopAuthService();
+                        ((MyApplication) getApplicationContext()).startAuthService();
                     }
                 }
                 // Elements par = loginform.select("[p]");

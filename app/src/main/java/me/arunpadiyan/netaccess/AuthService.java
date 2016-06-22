@@ -35,10 +35,17 @@ public class AuthService extends Service {
     Context mContext;
     public static int KEEP_AIVE_REFRESH = 1000 * 190;
     RequestQueue queue;
+    int keepAliveCount = 0;
 
     public AuthService() {
         t = new Timer();
 
+    }
+
+    @Override
+    public void onCreate() {
+
+        super.onCreate();
     }
 
     @Override
@@ -60,7 +67,10 @@ public class AuthService extends Service {
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-               KeepAlive(Utils.getprefString(MyApplication.KEEP_ALIVE,mContext));
+                keepAliveCount += 1;
+                Log.d("AuthService", "keepAliveCount : " +Integer.toString(keepAliveCount));
+
+                KeepAlive(Utils.getprefString(MyApplication.KEEP_ALIVE,mContext));
             }
 
         }, 0, KEEP_AIVE_REFRESH);
@@ -69,7 +79,10 @@ public class AuthService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d("AuthService", "onDestroy auth count : " +Integer.toString(keepAliveCount) );
+
         super.onDestroy();
+
         t.cancel();
     }
     public void NewFirewallAuth() {
@@ -81,7 +94,7 @@ public class AuthService extends Service {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("MainActivity", response);
+                        Log.d("AuthService", response);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -194,6 +207,7 @@ public class AuthService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                AuthLogOut();
                 NetworkResponse response = error.networkResponse;
                 Log.d(TAG, " KeepAlive error :" +error.toString());
             }
