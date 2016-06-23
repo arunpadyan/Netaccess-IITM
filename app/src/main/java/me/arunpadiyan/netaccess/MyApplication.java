@@ -46,6 +46,8 @@ public class MyApplication extends Application {
     public static final String NETACCESS_LOGIN  = "NETACCESS_LOGIN_ENABLED";
 
     public static final String NOTIFICATION_LOGIN_ENABLED = "notifcation_login";
+    public static final String ANALYTICS_ENABLED = "analytics_enabled";
+
 
     private Typeface mFontCabinRegular = null;
 

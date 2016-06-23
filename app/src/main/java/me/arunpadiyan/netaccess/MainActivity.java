@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -19,10 +20,12 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +34,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -148,7 +152,10 @@ public class MainActivity extends ActionBarActivity implements
             Utils.saveprefBool(MyApplication.SERVICE_ENABLED,true,this);
             Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
             Utils.saveprefBool("first_time_login",true,this);
+           // showCustomDialog();
+
         }
+
         context = this;
         setContentView(R.layout.activity_main);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -314,7 +321,7 @@ public class MainActivity extends ActionBarActivity implements
                 params.putString("context", "MainActivity");
                 mFirebaseAnalytics.logEvent("Logout", params);
                 NetworkResponse response = error.networkResponse;
-                Log.d("MainActivity", " getMagic error :" +error.toString());
+                Log.d("MainActivity", " AuthLogOut error : "+Utils.getprefString(MyApplication.LOG_OUT,context)+"  " +error.toString());
             }
         });
         Volley.newRequestQueue(this).add(stringRequest);
@@ -411,11 +418,12 @@ public class MainActivity extends ActionBarActivity implements
 
 
             return true;
-        }else if(id == R.id.action_about){
+        }else*/
+        if(id == R.id.action_about){
             Intent openNewActivity= new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(openNewActivity);
 
-        }else*/
+        }else
         if (id == R.id.app_share) {
             Intent intent = new AppInviteInvitation.IntentBuilder("invite others to use this App")
                     .setMessage("Since the NetAccess cups frequently these days ,this app is definitely a time saver for you")
@@ -555,9 +563,13 @@ public class MainActivity extends ActionBarActivity implements
 
                 }
                 FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(MyApplication.getContext());
-                Bundle params = new Bundle();
-                params.putString("result", "success");
-                mFirebaseAnalytics.logEvent("Notification_Login", params);
+
+                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                    Bundle params = new Bundle();
+                    params.putString("result", "success");
+                    mFirebaseAnalytics.logEvent("Notification_Login", params);
+
+                }
                 toast = loginform.text();
 
             }
@@ -653,9 +665,13 @@ public class MainActivity extends ActionBarActivity implements
                 if (loginform == null) {
                     test.setTextColor(Color.RED);
                     test.setText("wrong password ");
-                    Bundle params = new Bundle();
-                    params.putString("result", "wrong password");
-                    mFirebaseAnalytics.logEvent("MainActivity_Login", params);
+
+                    if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,context)){
+                        Bundle params = new Bundle();
+                        params.putString("result", "wrong password");
+                        mFirebaseAnalytics.logEvent("MainActivity_Login", params);
+                    }
+
                 } else {
                     test.setText(loginform.text());
                     saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
@@ -673,18 +689,19 @@ public class MainActivity extends ActionBarActivity implements
                     saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
                     saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
                     Utils.saveprefBool(mApp.VALID_PASS, true,context);
-                    Bundle params = new Bundle();
-                  //  mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
-                    params.putString("result", "success");
-                    mFirebaseAnalytics.logEvent("MainActivity_Login", params);
+                    if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,context)){
+                        Bundle params = new Bundle();
+                        params.putString("result", "success");
+                        mFirebaseAnalytics.logEvent("MainActivity_Login", params);
+                    }
+
                     /*t.send(new HitBuilders.EventBuilder()
                             .setCategory("Login")
                             .setAction("Success")
                             .build());*/
 
                     if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                        params.putString("Activity", "MainActivity");
                         ((MyApplication) getApplicationContext()).stopAuthService();
                         ((MyApplication) getApplicationContext()).startAuthService();
                     }
@@ -767,6 +784,47 @@ public class MainActivity extends ActionBarActivity implements
         protected void onProgressUpdate(String... text) {
 
         }
+    }
+    protected void showCustomDialog() {
+
+
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View dialog = inflater.inflate(R.layout.product_chat_dialog, null);
+        TextView  tvCancel,tvSend;
+
+        //final EditText editText = (EditText)dialog.findViewById(R.id.editText1);
+        // cancel = (Button)dialog.findViewById(R.id.cancel);
+
+        tvCancel = (TextView) dialog.findViewById(R.id.tv_cancel);
+        tvSend = (TextView) dialog.findViewById(R.id.tv_send);
+
+
+
+        alertDialogBuilder.setView(dialog);
+        alertDialogBuilder.setCancelable(true);
+        final AlertDialog Dialog = alertDialogBuilder.create();
+        Dialog.getWindow().getDecorView().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        Dialog.setCancelable(false);
+        Dialog.show();
+
+        tvSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,context);
+                Dialog.cancel();
+
+            }
+        });
+        tvCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,false,context);
+
+                Dialog.cancel();
+            }
+        });
+
     }
 
 

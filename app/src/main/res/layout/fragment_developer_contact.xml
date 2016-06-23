@@ -34,7 +34,8 @@
                 android:id="@+id/textView2"
                 android:fontFamily="sans-serif-light"
                 android:textSize="16dp"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

@@ -36,11 +36,13 @@
 
     <string name="about_main_messsage">Netaccess app let you put netaccess from notification drawer</string>
     <string name="about_special_thanks_message">My buddy, <b>Aqel Ahammed</b> for his creative ideas and the beta testers for their feedback &amp; bug reports:
-    \n\n<li>Aravind Manoj</li>
-    \n<li>Arunjith</li>
-    \n<li>Arjun Prasannan</li>
-    \n<li>Aswin Rajeevan</li>
-    \n<li>Rouzif Rasheed</li>
+        \n\n<li>Aravind Manoj</li>
+        \n<li>Arunjith</li>
+        \n<li>Arjun Prasannan</li>
+        \n<li>Aswin Rajeevan</li>
+        \n<li>Rouzif Rasheed</li>
+        \n<li>Shahidh K Muhammed</li>
+
     </string>
 
     <string name="hey_there">HEY THERE!</string>

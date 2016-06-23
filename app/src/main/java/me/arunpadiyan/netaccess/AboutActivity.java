@@ -1,6 +1,7 @@
 package me.arunpadiyan.netaccess;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
@@ -14,12 +15,14 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final Context context = this;
         setContentView(R.layout.about_me);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("About");
@@ -28,6 +31,16 @@ public class AboutActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         getSupportActionBar().setTitle("About");
+
+        LinearLayout dev = (LinearLayout) findViewById(R.id.developer);
+        dev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("dsf","sdf");
+                DeveloperContact newObject = DeveloperContact.getInstance(context);
+                newObject.show(getFragmentManager(), "Developer Contact Dialog");
+            }
+        });
 
     }
     @Override
@@ -48,10 +61,6 @@ public class AboutActivity extends AppCompatActivity {
         Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "arunpadyan@gmail.com", null));
 
         switch(v.getId()){
-            case R.id.developer_icon:
-                DeveloperContact newObject = DeveloperContact.getInstance(this);
-                newObject.show(getFragmentManager(), "Developer Contact Dialog");
-                break;
 
             case R.id.rate_on_play_store_button:
                 Intent intent = new Intent(Intent.ACTION_VIEW);

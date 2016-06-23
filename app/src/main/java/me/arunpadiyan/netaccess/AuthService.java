@@ -75,9 +75,13 @@ public class AuthService extends Service {
                 keepAliveCount += 1;
                 Log.d("AuthService", "keepAliveCount : " +Integer.toString(keepAliveCount));
                 KeepAlive(Utils.getprefString(MyApplication.KEEP_ALIVE,mContext));
-                Bundle params = new Bundle();
-                params.putString("context", TAG);
-                mFirebaseAnalytics.logEvent("Login_try_"+TAG, params);
+
+
+                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                    Bundle params = new Bundle();
+                    params.putString("context", TAG);
+                    mFirebaseAnalytics.logEvent("Login_try_"+TAG, params);
+                }
             }
 
         }, 0, KEEP_AIVE_REFRESH);
@@ -87,9 +91,13 @@ public class AuthService extends Service {
     @Override
     public void onDestroy() {
         Log.d("AuthService", "onDestroy auth count : " +Integer.toString(keepAliveCount) );
-        Bundle params = new Bundle();
-        params.putString("context", TAG);
-        mFirebaseAnalytics.logEvent(TAG+"_onDestroy", params);
+
+        if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+            Bundle params = new Bundle();
+            params.putString("context", TAG);
+            mFirebaseAnalytics.logEvent(TAG+"_onDestroy", params);
+
+        }
         super.onDestroy();
 
         t.cancel();
@@ -163,8 +171,8 @@ public class AuthService extends Service {
                     @Override
                     public void onResponse(String response) {
 
-                        Log.d(TAG , "getMagic :"+ getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response));
-                        magic[0] = getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response);
+                        Log.d(TAG , "getMagic :"+ getRegexString("\"magic\" value=\"(.+?)\"",response));
+                        magic[0] = getRegexString("\"magic\" value=\"(.+?)\"",response);
 
                         NewFirewallAuthLogin(url,magic[0]);
                     }
@@ -221,10 +229,14 @@ public class AuthService extends Service {
             @Override
             public void onErrorResponse(VolleyError error) {
                 AuthLogOut();
-                Bundle params = new Bundle();
-                params.putString("result", "failed");
-                params.putString("context", TAG);
-                mFirebaseAnalytics.logEvent("KeepAlive", params);
+                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+
+                    Bundle params = new Bundle();
+                    params.putString("result", "failed");
+                    params.putString("context", TAG);
+                    mFirebaseAnalytics.logEvent("KeepAlive", params);
+                }
+
                 NetworkResponse response = error.networkResponse;
                 Log.d(TAG, " KeepAlive error :" +error.toString());
             }
@@ -251,19 +263,22 @@ public class AuthService extends Service {
                     public void onResponse(String response) {
                         //   Log.d(TAG", response);
 
-                        String logout = getRegexString("location.href=\"(?<cap>.+logout.+?)\"",response);
-                        String keepalive = getRegexString("location.href=\"(?<cap>.+keepalive.+?)\"",response);
+                        String logout = getRegexString("location.href=\"(.+?logout.+?)\"",response);
+                        String keepalive = getRegexString("location.href=\"(.+?keepalive.+?)\"",response);
 
                         Toast.makeText(mContext,"Firewall Authentication successful \n rollno :"
                                 +Utils.getprefString(MyApplication.USER_NAME,mContext),Toast.LENGTH_LONG).show();
                         Utils.saveprefString(MyApplication.LOG_OUT,logout,mContext);
                         Utils.saveprefString(MyApplication.KEEP_ALIVE,keepalive,mContext);
 
-                        Bundle params = new Bundle();
-                        params.putString("result", "success");
-                        params.putString("context", TAG);
-                        mFirebaseAnalytics.logEvent("NewFirewallAuthLogin", params);
 
+                        if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+
+                            Bundle params = new Bundle();
+                            params.putString("result", "success");
+                            params.putString("context", TAG);
+                            mFirebaseAnalytics.logEvent("NewFirewallAuthLogin", params);
+                        }
                         Log.d(TAG,"logout link : "+logout);
                         Log.d(TAG,"keepalive link : "+keepalive);
 
@@ -273,9 +288,14 @@ public class AuthService extends Service {
             public void onErrorResponse(VolleyError error) {
                 Bundle params = new Bundle();
 
-                params.putString("result", "failed");
-                params.putString("context", TAG);
-                mFirebaseAnalytics.logEvent("NewFirewallAuthLogin", params);
+
+                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+
+                    params.putString("result", "failed");
+                    params.putString("context", TAG);
+                    mFirebaseAnalytics.logEvent("NewFirewallAuthLogin", params);
+                }
+
                 NetworkResponse response = error.networkResponse;
                 Log.d(TAG,error.toString());
                 //  int mStatusCode = response.statusCode;

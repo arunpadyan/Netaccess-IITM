@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialoge_bg"
+    android:layout_marginLeft="5dp"
+    android:orientation="vertical">
+
+
+    <me.arunpadiyan.netaccess.NATextView
+        android:text="We will be collecting information like crash reports and user events for further improvements in the app. "
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="@color/colorPrimary"
+        app:fontName="fjord"
+        android:textSize="13sp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border_grey"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="15dp">
+
+            <me.arunpadiyan.netaccess.NATextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:paddingLeft="35dp"
+                android:paddingRight="35dp"
+                android:paddingTop="5dp"
+                android:text="Optout"
+                android:textColor="@color/colorPrimary"
+                android:textSize="15sp"
+                app:fontName="fjord" />
+
+            <me.arunpadiyan.netaccess.NATextView
+                android:id="@+id/tv_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_gray"
+                android:paddingBottom="7dp"
+                android:paddingLeft="35dp"
+                android:paddingRight="35dp"
+                android:paddingTop="7dp"
+                android:text="Optin"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                app:fontName="fjord" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
