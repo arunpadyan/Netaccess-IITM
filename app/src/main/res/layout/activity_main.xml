@@ -70,7 +70,7 @@
                 <CheckBox
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/notifiation"
+                    android:id="@+id/trackData"
                     android:layout_gravity="right"
                     android:checked="true"
                     android:text="Notification Login"
@@ -128,7 +128,7 @@
                     android:text="This ldap credentials won&apos;t be used any where else. Feel free to checkout source code  https://github.com/arunpadyan/netaccess-iitm"
                     android:visibility="visible"
                     android:layout_marginTop="20dp"
-                    android:layout_below="@+id/notifiation"
+                    android:layout_below="@+id/trackData"
                     android:layout_centerHorizontal="true"
                     app:fontName = "fjord"/>
 

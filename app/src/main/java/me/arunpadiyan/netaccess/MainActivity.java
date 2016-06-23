@@ -34,7 +34,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -148,10 +147,12 @@ public class MainActivity extends ActionBarActivity implements
         mApp = (MyApplication) getApplicationContext();
         super.onCreate(savedInstanceState);
 
-        if(!Utils.getprefBool("first_time_login",this)){
+        if(!Utils.getprefBool("first_time_login1",this)){
             Utils.saveprefBool(MyApplication.SERVICE_ENABLED,true,this);
             Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
-            Utils.saveprefBool("first_time_login",true,this);
+            Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,this);
+
+            Utils.saveprefBool("first_time_login1",true,this);
            // showCustomDialog();
 
         }
@@ -214,7 +215,7 @@ public class MainActivity extends ActionBarActivity implements
             }
         });
 
-        CheckBox Notifi = (CheckBox) findViewById(R.id.notifiation);
+        CheckBox Notifi = (CheckBox) findViewById(R.id.trackData);
         CheckBox cbService = (CheckBox) findViewById(R.id.service);
         CheckBox cbNetAccess = (CheckBox) findViewById(R.id.netacces);
 
@@ -412,13 +413,13 @@ public class MainActivity extends ActionBarActivity implements
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-       /* if (id == R.id.action_settings) {
+        if (id == R.id.action_settings) {
             Intent openNewActivity= new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(openNewActivity);
 
 
             return true;
-        }else*/
+        }else
         if(id == R.id.action_about){
             Intent openNewActivity= new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(openNewActivity);

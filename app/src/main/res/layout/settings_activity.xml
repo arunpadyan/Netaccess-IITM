@@ -12,12 +12,13 @@
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/notifiation"
+        android:id="@+id/trackData"
         android:layout_gravity="right"
         android:layout_margin="10dp"
         android:checked="true"
-        android:text="Notification Login"
-        android:textSize="16dp" />
+        android:text="We will be collecting information like crash reports and user events for further improvements in the app. "
+        android:textSize="16dp"
+        android:gravity="top" />
 
     <CheckBox
         android:layout_width="fill_parent"
@@ -28,6 +29,6 @@
         android:layout_margin="10dp"
         android:checked="true"
         android:textSize="16dp"
-        />
+        android:visibility="gone" />
 
 </LinearLayout>

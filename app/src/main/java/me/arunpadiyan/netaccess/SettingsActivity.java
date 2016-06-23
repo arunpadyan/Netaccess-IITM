@@ -1,6 +1,5 @@
 package me.arunpadiyan.netaccess;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -59,15 +58,12 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Settings");
 
-        CheckBox Notifi = (CheckBox) findViewById(R.id.notifiation);
+        CheckBox Notifi = (CheckBox) findViewById(R.id.trackData);
         CheckBox save = (CheckBox) findViewById(R.id.save_password);
-        if(getBool("notifcation_login")){
-            Notifi.setChecked(false);
-        }
-        if(getBool("save_password")){
-            save.setChecked(false);
 
-        }
+        Notifi.setChecked(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,this));
+
+
 
         Notifi.setOnClickListener(new View.OnClickListener() {
 
@@ -75,12 +71,12 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                   saveBool("notifcation_login",false);
+                   Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,getApplicationContext());
                 }
                 else {
-                    saveBool("notifcation_login",true);
+                    Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,false,getApplicationContext());
                 }
-           NotificationChecker();
+         //  NotificationChecker();
 
 
 
