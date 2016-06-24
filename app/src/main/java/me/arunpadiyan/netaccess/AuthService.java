@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -32,13 +33,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AuthService extends Service {
+
     public static  final  String TAG = "AuthService";
+    public static boolean allowDestroy = false;
     Timer t;
     Context mContext;
     public static int KEEP_AIVE_REFRESH = 1000 * 190;
     RequestQueue queue;
     int keepAliveCount = 0;
     private FirebaseAnalytics mFirebaseAnalytics;
+    public static boolean isStarted = false;
 
     public AuthService() {
         t = new Timer();
@@ -61,14 +65,20 @@ public class AuthService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
        // mApp = (MyApplication) getApplicationContext();
-
+        Timer t = new Timer();
+        allowDestroy = false;
         mContext = this;
         queue = Volley.newRequestQueue(this);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         NewFirewallAuth();
 
-        Timer t = new Timer();
+        if (isStarted){      //yes - do nothing
+            t.cancel();
+            t = new Timer();
+        } else {             //no
+            isStarted = true;
+        }
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -85,27 +95,30 @@ public class AuthService extends Service {
             }
 
         }, 0, KEEP_AIVE_REFRESH);
+
+
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.d("AuthService", "onDestroy auth count : " +Integer.toString(keepAliveCount) );
-
         if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
             Bundle params = new Bundle();
             params.putString("context", TAG);
             mFirebaseAnalytics.logEvent(TAG+"_onDestroy", params);
-
         }
-        super.onDestroy();
-
         t.cancel();
+        if (!allowDestroy){
+            startService(new Intent(this, AuthService.class));
+        }else {
+            Log.d("AuthService", "onDestroyed auth count : " +Integer.toString(keepAliveCount) );
+        }
     }
     public void NewFirewallAuth() {
         final String function  = "NewFirewallAuth";
         String url = "http://connectivitycheck.gstatic.com/generate_204";
-        //HttpURLConnection.setFollowRedirects(true);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -133,6 +146,7 @@ public class AuthService extends Service {
                     Log.d(TAG,function+ " ResponseCode :" + Integer.toString(mStatusCode));
 
                     if(mStatusCode != 204){
+                        Log.d(TAG, " getMagic url :" +links.get(0).attr("href"));
                         getMagic(links.get(0).attr("href"));
                     }
                 }else {
@@ -163,6 +177,7 @@ public class AuthService extends Service {
 
 
     private void getMagic(final String url) {
+
         final String[] magic = {""};
 
         // HttpURLConnection.setFollowRedirects(true);
@@ -266,8 +281,7 @@ public class AuthService extends Service {
                         String logout = getRegexString("location.href=\"(.+?logout.+?)\"",response);
                         String keepalive = getRegexString("location.href=\"(.+?keepalive.+?)\"",response);
 
-                        Toast.makeText(mContext,"Firewall Authentication successful \n rollno :"
-                                +Utils.getprefString(MyApplication.USER_NAME,mContext),Toast.LENGTH_LONG).show();
+
                         Utils.saveprefString(MyApplication.LOG_OUT,logout,mContext);
                         Utils.saveprefString(MyApplication.KEEP_ALIVE,keepalive,mContext);
 
@@ -281,6 +295,10 @@ public class AuthService extends Service {
                         }
                         Log.d(TAG,"logout link : "+logout);
                         Log.d(TAG,"keepalive link : "+keepalive);
+                        if(logout.trim().length()>10){
+                            Toast.makeText(mContext,"Firewall Authentication successful \n using rollno : "
+                                    +Utils.getprefString(MyApplication.USER_NAME,mContext),Toast.LENGTH_LONG).show();
+                        }
 
                     }
                 }, new Response.ErrorListener() {

@@ -15,8 +15,8 @@
         android:id="@+id/trackData"
         android:layout_gravity="right"
         android:layout_margin="10dp"
-        android:checked="true"
-        android:text="We will be collecting information like crash reports and user events for further improvements in the app. "
+        android:checked="false"
+        android:text="Allow app to track  information like crash reports and user events for future improvements in the app. "
         android:textSize="16dp"
         android:gravity="top" />
 
@@ -30,5 +30,13 @@
         android:checked="true"
         android:textSize="16dp"
         android:visibility="gone" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tip :if you are in hostel area disable netaccess login for faster authentication of firewall"
+        android:id="@+id/textView3"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" />
 
 </LinearLayout>

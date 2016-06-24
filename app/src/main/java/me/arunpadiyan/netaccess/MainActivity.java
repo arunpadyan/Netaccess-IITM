@@ -210,8 +210,14 @@ public class MainActivity extends ActionBarActivity implements
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (requstGoing) new Login().execute();
-
+                if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
+                    if (requstGoing) new Login().execute();
+                }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
+                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                        ((MyApplication) getApplicationContext()).stopAuthService();
+                        ((MyApplication) getApplicationContext()).startAuthService();
+                    }
+                }
             }
         });
 

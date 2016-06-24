@@ -29,6 +29,7 @@ import org.jsoup.select.Elements;
 import org.jsoup.select.Evaluator;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -66,6 +67,8 @@ public class MyApplication extends Application {
         }
         instance = this;
         new NukeSSLCerts().nuke();
+        HttpURLConnection.setFollowRedirects(true);
+
         mContext = this;
 
 
@@ -77,6 +80,7 @@ public class MyApplication extends Application {
     }
 
     public void stopAuthService(){
+        AuthService.allowDestroy = true;
         stopService(new Intent(this, AuthService.class));
 
     }

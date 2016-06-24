@@ -73,7 +73,7 @@
                     android:id="@+id/trackData"
                     android:layout_gravity="right"
                     android:checked="true"
-                    android:text="Notification Login"
+                    android:text="Show Notification"
                     android:textSize="16dp"
                     android:layout_below="@+id/service"
                     android:layout_alignLeft="@+id/service"
