@@ -24,7 +24,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -34,16 +33,17 @@ import java.util.regex.Pattern;
 
 public class AuthService extends Service {
 
-    public static  final  String TAG = "AuthService";
+    public static final String TAG = "AuthService";
+    public static int KEEP_AIVE_REFRESH = 1000 * 150;
+
     public static boolean allowDestroy = false;
     Context mContext;
-    public static int KEEP_AIVE_REFRESH = 1000 * 150;
     RequestQueue queue;
     int keepAliveCount = 0;
     private FirebaseAnalytics mFirebaseAnalytics;
     public static boolean isStarted = false;
     Timer t;
-    long startTime=System.currentTimeMillis();
+    long startTime = System.currentTimeMillis();
 
     public AuthService() {
         t = new Timer();
@@ -65,7 +65,7 @@ public class AuthService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-       // mApp = (MyApplication) getApplicationContext();
+        // mApp = (MyApplication) getApplicationContext();
         allowDestroy = false;
         mContext = this;
         queue = Volley.newRequestQueue(this);
@@ -74,9 +74,9 @@ public class AuthService extends Service {
 
         NewFirewallAuth();
 
-        if (isStarted){      //yes - do nothing
+        if (isStarted) {      //yes - do nothing
             t.cancel();
-           t = new Timer();
+            t = new Timer();
         } else {             //no
             isStarted = true;
             t = new Timer();
@@ -86,16 +86,16 @@ public class AuthService extends Service {
             @Override
             public void run() {
                 keepAliveCount += 1;
-                long endTime=System.currentTimeMillis();
-                Log.d("AuthService", "keepAliveCount : " +Integer.toString(keepAliveCount));
-                Log.d("AuthService", "keepAliveTimeDiff : " +Long.toString(endTime-startTime));
+                long endTime = System.currentTimeMillis();
+                Log.d("AuthService", "keepAliveCount : " + Integer.toString(keepAliveCount));
+                Log.d("AuthService", "keepAliveTimeDiff : " + Long.toString(endTime - startTime));
                 startTime = endTime;
 
-                KeepAlive(Utils.getprefString(MyApplication.KEEP_ALIVE,mContext));
-                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                KeepAlive(Utils.getprefString(MyApplication.KEEP_ALIVE, mContext));
+                if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, MyApplication.getContext())) {
                     Bundle params = new Bundle();
                     params.putString("context", TAG);
-                    mFirebaseAnalytics.logEvent("Login_try_"+TAG, params);
+                    mFirebaseAnalytics.logEvent("Login_try_" + TAG, params);
                 }
             }
 
@@ -108,21 +108,22 @@ public class AuthService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("AuthService", "onDestroy auth count : " +Integer.toString(keepAliveCount) );
-        if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+        Log.d("AuthService", "onDestroy auth count : " + Integer.toString(keepAliveCount));
+        if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, MyApplication.getContext())) {
             Bundle params = new Bundle();
             params.putString("context", TAG);
-            mFirebaseAnalytics.logEvent(TAG+"_onDestroy", params);
+            mFirebaseAnalytics.logEvent(TAG + "_onDestroy", params);
         }
         t.cancel();
-        if (!allowDestroy){
+        if (!allowDestroy) {
             startService(new Intent(this, AuthService.class));
-        }else {
-            Log.d("AuthService", "onDestroyed auth count : " +Integer.toString(keepAliveCount) );
+        } else {
+            Log.d("AuthService", "onDestroyed auth count : " + Integer.toString(keepAliveCount));
         }
     }
+
     public void NewFirewallAuth() {
-        final String function  = "NewFirewallAuth";
+        final String function = "NewFirewallAuth";
         String url = "http://connectivitycheck.gstatic.com/generate_204";
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -135,7 +136,7 @@ public class AuthService extends Service {
             @Override
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse response = error.networkResponse;
-                if(response != null){
+                if (response != null) {
                     int mStatusCode = response.statusCode;
                     String parsed;
                     try {
@@ -145,17 +146,17 @@ public class AuthService extends Service {
                     }
                     Document doc = Jsoup.parse(parsed);
                     Elements links = doc.select("a[href]");
-                    Log.d(TAG,function +" :"+ links.get(0).attr("href"));
+                    Log.d(TAG, function + " :" + links.get(0).attr("href"));
 
-                    Log.d(TAG,function+ " Data :" + parsed);
-                    Log.d(TAG,function+ " ResponseCode :" + Integer.toString(mStatusCode));
+                    Log.d(TAG, function + " Data :" + parsed);
+                    Log.d(TAG, function + " ResponseCode :" + Integer.toString(mStatusCode));
 
-                    if(mStatusCode != 204){
-                        Log.d(TAG, " getMagic url :" +links.get(0).attr("href"));
+                    if (mStatusCode != 204) {
+                        Log.d(TAG, " getMagic url :" + links.get(0).attr("href"));
                         getMagic(links.get(0).attr("href"));
                     }
-                }else {
-                    Log.d(TAG,function+ " network error" );
+                } else {
+                    Log.d(TAG, function + " network error");
 
                 }
             }
@@ -170,8 +171,8 @@ public class AuthService extends Service {
                     } catch (UnsupportedEncodingException e) {
                         parsed = new String(response.data);
                     }
-                    Log.d(TAG, function +" :"+"Data :" + parsed);
-                    Log.d(TAG, function +" :"+"ResponseCode :" + Integer.toString(mStatusCode));
+                    Log.d(TAG, function + " :" + "Data :" + parsed);
+                    Log.d(TAG, function + " :" + "ResponseCode :" + Integer.toString(mStatusCode));
                     AuthLogOut();
                 }
                 return super.parseNetworkResponse(response);
@@ -191,17 +192,17 @@ public class AuthService extends Service {
                     @Override
                     public void onResponse(String response) {
 
-                        Log.d(TAG , "getMagic :"+ getRegexString("\"magic\" value=\"(.+?)\"",response));
-                        magic[0] = getRegexString("\"magic\" value=\"(.+?)\"",response);
+                        Log.d(TAG, "getMagic :" + getRegexString("\"magic\" value=\"(.+?)\"", response));
+                        magic[0] = getRegexString("\"magic\" value=\"(.+?)\"", response);
 
-                        NewFirewallAuthLogin(url,magic[0]);
+                        NewFirewallAuthLogin(url, magic[0]);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse response = error.networkResponse;
-                Log.d(TAG, " getMagic error :" +error.toString());
-                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                Log.d(TAG, " getMagic error :" + error.toString());
+                if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, MyApplication.getContext())) {
                     Bundle params = new Bundle();
                     params.putString("context", TAG);
                     mFirebaseAnalytics.logEvent("getMagic_error", params);
@@ -212,16 +213,16 @@ public class AuthService extends Service {
     }
 
     //for logout
-    private void AuthLogOut( ) {
-        final String url =Utils.getprefString(MyApplication.LOG_OUT,mContext);
-        final String function = "AuthLogOut" ;
+    private void AuthLogOut() {
+        final String url = Utils.getprefString(MyApplication.LOG_OUT, mContext);
+        final String function = "AuthLogOut";
         final String[] magic = {""};
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
-                        Log.d(TAG ,function+" :response :"+response);
+                        Log.d(TAG, function + " :response :" + response);
                         getMagic(url);
                       /*  Log.d(TAG getMagic", getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response));
                         magic[0] = getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response);
@@ -231,7 +232,7 @@ public class AuthService extends Service {
             @Override
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse response = error.networkResponse;
-                Log.d(TAG, " getMagic error :" +error.toString());
+                Log.d(TAG, " getMagic error :" + error.toString());
             }
         });
         queue.add(stringRequest);
@@ -248,13 +249,13 @@ public class AuthService extends Service {
                         params.putString("result", "success");
                         params.putString("context", TAG);
                         mFirebaseAnalytics.logEvent("KeepAlive", params);
-                        Log.d(TAG," KeepAlive:" +url);
+                        Log.d(TAG, " KeepAlive:" + url);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 AuthLogOut();
-                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, MyApplication.getContext())) {
 
                     Bundle params = new Bundle();
                     params.putString("result", "failed");
@@ -263,22 +264,22 @@ public class AuthService extends Service {
                 }
                 NewFirewallAuth();
                 NetworkResponse response = error.networkResponse;
-                Log.d(TAG, " KeepAlive error :" +error.toString());
+                Log.d(TAG, " KeepAlive error :" + error.toString());
             }
         });
         queue.add(stringRequest);
     }
 
-    private String getRegexString(String patern,String string){
+    private String getRegexString(String patern, String string) {
         Pattern p = Pattern.compile(patern);
         Matcher m = p.matcher(string);
-        if(m.find())
+        if (m.find())
             return m.group(1);
 
         return "";
     }
 
-    public void NewFirewallAuthLogin(final String AuthLink,final String magic) {
+    public void NewFirewallAuthLogin(final String AuthLink, final String magic) {
 
         String url = "https://nfw.iitm.ac.in:1003/";
 
@@ -288,26 +289,26 @@ public class AuthService extends Service {
                     public void onResponse(String response) {
                         //   Log.d(TAG", response);
 
-                        String logout = getRegexString("location.href=\"(.+?logout.+?)\"",response);
-                        String keepalive = getRegexString("location.href=\"(.+?keepalive.+?)\"",response);
+                        String logout = getRegexString("location.href=\"(.+?logout.+?)\"", response);
+                        String keepalive = getRegexString("location.href=\"(.+?keepalive.+?)\"", response);
 
 
-                        Utils.saveprefString(MyApplication.LOG_OUT,logout,mContext);
-                        Utils.saveprefString(MyApplication.KEEP_ALIVE,keepalive,mContext);
+                        Utils.saveprefString(MyApplication.LOG_OUT, logout, mContext);
+                        Utils.saveprefString(MyApplication.KEEP_ALIVE, keepalive, mContext);
 
 
-                        if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                        if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, MyApplication.getContext())) {
 
                             Bundle params = new Bundle();
                             params.putString("result", "success");
                             params.putString("context", TAG);
                             mFirebaseAnalytics.logEvent("NewFirewallAuthLogin", params);
                         }
-                        Log.d(TAG,"logout link : "+logout);
-                        Log.d(TAG,"keepalive link : "+keepalive);
-                        if(logout.trim().length()>10){
-                            Toast.makeText(mContext,"Firewall Authentication successful \n using rollno : "
-                                    +Utils.getprefString(MyApplication.USER_NAME,mContext),Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "logout link : " + logout);
+                        Log.d(TAG, "keepalive link : " + keepalive);
+                        if (logout.trim().length() > 10) {
+                            Toast.makeText(mContext, "Firewall Authentication successful \n using rollno : "
+                                    + Utils.getprefString(MyApplication.USER_NAME, mContext), Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -317,7 +318,7 @@ public class AuthService extends Service {
                 Bundle params = new Bundle();
 
 
-                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, MyApplication.getContext())) {
 
                     params.putString("result", "failed");
                     params.putString("context", TAG);
@@ -325,7 +326,7 @@ public class AuthService extends Service {
                 }
 
                 NetworkResponse response = error.networkResponse;
-                Log.d(TAG,error.toString());
+                Log.d(TAG, error.toString());
                 //  int mStatusCode = response.statusCode;
                 /*String parsed;
                 try {
@@ -339,17 +340,17 @@ public class AuthService extends Service {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("username",  Utils.getprefString(MyApplication.USER_NAME,mContext));
-                params.put("password", Utils.getprefString(MyApplication.LDAP_PASSWORD,mContext));
+                params.put("username", Utils.getprefString(MyApplication.USER_NAME, mContext));
+                params.put("password", Utils.getprefString(MyApplication.LDAP_PASSWORD, mContext));
                 params.put("4Tredir", "http://connectivitycheck.gstatic.com/generate_204");
-                params.put("magic",magic);
+                params.put("magic", magic);
 
                 return params;
             }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<String, String>();
                 params.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36");
                 params.put("Referer", AuthLink);
 
