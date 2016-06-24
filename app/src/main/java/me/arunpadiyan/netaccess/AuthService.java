@@ -36,13 +36,14 @@ public class AuthService extends Service {
 
     public static  final  String TAG = "AuthService";
     public static boolean allowDestroy = false;
-    Timer t;
     Context mContext;
-    public static int KEEP_AIVE_REFRESH = 1000 * 190;
+    public static int KEEP_AIVE_REFRESH = 1000 * 150;
     RequestQueue queue;
     int keepAliveCount = 0;
     private FirebaseAnalytics mFirebaseAnalytics;
     public static boolean isStarted = false;
+    Timer t;
+    long startTime=System.currentTimeMillis();
 
     public AuthService() {
         t = new Timer();
@@ -65,28 +66,32 @@ public class AuthService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
        // mApp = (MyApplication) getApplicationContext();
-        Timer t = new Timer();
         allowDestroy = false;
         mContext = this;
         queue = Volley.newRequestQueue(this);
+
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         NewFirewallAuth();
 
         if (isStarted){      //yes - do nothing
             t.cancel();
-            t = new Timer();
+           t = new Timer();
         } else {             //no
             isStarted = true;
+            t = new Timer();
+
         }
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 keepAliveCount += 1;
+                long endTime=System.currentTimeMillis();
                 Log.d("AuthService", "keepAliveCount : " +Integer.toString(keepAliveCount));
+                Log.d("AuthService", "keepAliveTimeDiff : " +Long.toString(endTime-startTime));
+                startTime = endTime;
+
                 KeepAlive(Utils.getprefString(MyApplication.KEEP_ALIVE,mContext));
-
-
                 if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
                     Bundle params = new Bundle();
                     params.putString("context", TAG);
@@ -94,7 +99,7 @@ public class AuthService extends Service {
                 }
             }
 
-        }, 0, KEEP_AIVE_REFRESH);
+        }, 1000, KEEP_AIVE_REFRESH);
 
 
         return START_STICKY;
@@ -196,6 +201,11 @@ public class AuthService extends Service {
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse response = error.networkResponse;
                 Log.d(TAG, " getMagic error :" +error.toString());
+                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                    Bundle params = new Bundle();
+                    params.putString("context", TAG);
+                    mFirebaseAnalytics.logEvent("getMagic_error", params);
+                }
             }
         });
         queue.add(stringRequest);
@@ -251,7 +261,7 @@ public class AuthService extends Service {
                     params.putString("context", TAG);
                     mFirebaseAnalytics.logEvent("KeepAlive", params);
                 }
-
+                NewFirewallAuth();
                 NetworkResponse response = error.networkResponse;
                 Log.d(TAG, " KeepAlive error :" +error.toString());
             }

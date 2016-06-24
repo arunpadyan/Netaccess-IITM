@@ -67,7 +67,7 @@ public class MyApplication extends Application {
         }
         instance = this;
         new NukeSSLCerts().nuke();
-        HttpURLConnection.setFollowRedirects(true);
+      //  HttpURLConnection.setFollowRedirects(true);
 
         mContext = this;
 

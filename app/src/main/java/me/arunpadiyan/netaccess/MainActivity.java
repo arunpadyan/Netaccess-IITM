@@ -194,7 +194,7 @@ public class MainActivity extends ActionBarActivity implements
                     if (requstGoing) new Login().execute();
                 }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
                     if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                        ((MyApplication) getApplicationContext()).stopAuthService();
+                  //      ((MyApplication) getApplicationContext()).stopAuthService();
                         ((MyApplication) getApplicationContext()).startAuthService();
                     }
                 }
@@ -214,7 +214,7 @@ public class MainActivity extends ActionBarActivity implements
                     if (requstGoing) new Login().execute();
                 }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
                     if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                        ((MyApplication) getApplicationContext()).stopAuthService();
+                    //    ((MyApplication) getApplicationContext()).stopAuthService();
                         ((MyApplication) getApplicationContext()).startAuthService();
                     }
                 }
@@ -234,7 +234,7 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                    ((MyApplication) getApplicationContext()).stopAuthService();
+                 //   ((MyApplication) getApplicationContext()).stopAuthService();
                     ((MyApplication) getApplicationContext()).startAuthService();
                     Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true,context);
                 } else {
@@ -492,7 +492,7 @@ public class MainActivity extends ActionBarActivity implements
                 new LoginNotif().execute();
             }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
                 if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                    ((MyApplication) context.getApplicationContext()).stopAuthService();
+                   // ((MyApplication) context.getApplicationContext()).stopAuthService();
                     ((MyApplication) context.getApplicationContext()).startAuthService();
                 }
             }
@@ -565,7 +565,7 @@ public class MainActivity extends ActionBarActivity implements
                 v.vibrate(60);
 
                 if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,MyApplication.getContext())) {
-                    ((MyApplication) MyApplication.getContext()).stopAuthService();
+                   // ((MyApplication) MyApplication.getContext()).stopAuthService();
                     ((MyApplication) MyApplication.getContext()).startAuthService();
 
                 }
