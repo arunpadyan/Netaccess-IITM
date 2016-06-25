@@ -16,6 +16,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -152,9 +153,17 @@ public class MainActivity extends ActionBarActivity implements
             Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
             Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,this);
           //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
-
             Utils.saveprefBool("first_time_login1",true,this);
            // showCustomDialog();
+
+        }
+        if(!Utils.getprefBool("first_time_login12",this)){
+            if(Build.VERSION.SDK_INT <21){
+                showCustomDialog();
+            }
+            //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
+            Utils.saveprefBool("first_time_login12",true,this);
+            // showCustomDialog();
 
         }
 
@@ -819,7 +828,7 @@ public class MainActivity extends ActionBarActivity implements
         tvSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,context);
+              //  Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,context);
                 Dialog.cancel();
 
             }
@@ -827,7 +836,7 @@ public class MainActivity extends ActionBarActivity implements
         tvCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,false,context);
+              //  Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,false,context);
 
                 Dialog.cancel();
             }

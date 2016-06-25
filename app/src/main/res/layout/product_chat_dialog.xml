@@ -9,7 +9,7 @@
 
 
     <me.arunpadiyan.netaccess.NATextView
-        android:text="We will be collecting information like crash reports and user events for further improvements in the app. "
+        android:text="For pre lollipop android devices Firewall login may not work properly. We will fix this bug in future updates"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textColor="@color/colorPrimary"
@@ -50,7 +50,8 @@
                 android:text="Optout"
                 android:textColor="@color/colorPrimary"
                 android:textSize="15sp"
-                app:fontName="fjord" />
+                app:fontName="fjord"
+                android:visibility="gone" />
 
             <me.arunpadiyan.netaccess.NATextView
                 android:id="@+id/tv_send"
@@ -61,7 +62,7 @@
                 android:paddingLeft="35dp"
                 android:paddingRight="35dp"
                 android:paddingTop="7dp"
-                android:text="Optin"
+                android:text="Ok"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 app:fontName="fjord" />
