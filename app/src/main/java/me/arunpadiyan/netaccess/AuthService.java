@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 public class AuthService extends Service {
 
     public static final String TAG = "AuthService";
-    public static int KEEP_AIVE_REFRESH = 1000 * 150;
+    public static int KEEP_AIVE_REFRESH = 1000 * 60 * 9;
 
     public static boolean allowDestroy = false;
     Context mContext;
