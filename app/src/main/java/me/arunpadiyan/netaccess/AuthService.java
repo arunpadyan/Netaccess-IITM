@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 public class AuthService extends Service {
 
     public static final String TAG = "AuthService";
-    public static int KEEP_AIVE_REFRESH = 1000 * 150;
+    public static int KEEP_AIVE_REFRESH = 1000 * 480;
 
     public static boolean allowDestroy = false;
     Context mContext;
@@ -173,7 +173,9 @@ public class AuthService extends Service {
                     }
                     Log.d(TAG, function + " :" + "Data :" + parsed);
                     Log.d(TAG, function + " :" + "ResponseCode :" + Integer.toString(mStatusCode));
-                    AuthLogOut();
+                    if(Utils.getprefBool(MyApplication.FORCE_LOGIN,mContext)){
+                        AuthLogOut();
+                    }
                 }
                 return super.parseNetworkResponse(response);
             }

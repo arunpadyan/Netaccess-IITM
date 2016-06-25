@@ -151,6 +151,7 @@ public class MainActivity extends ActionBarActivity implements
             Utils.saveprefBool(MyApplication.SERVICE_ENABLED,true,this);
             Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
             Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,this);
+          //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
 
             Utils.saveprefBool("first_time_login1",true,this);
            // showCustomDialog();

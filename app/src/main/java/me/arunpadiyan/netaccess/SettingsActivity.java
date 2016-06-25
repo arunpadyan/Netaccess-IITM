@@ -59,12 +59,11 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Settings");
 
         CheckBox Notifi = (CheckBox) findViewById(R.id.trackData);
+        CheckBox ForceLogin = (CheckBox) findViewById(R.id.forcelogin);
+
         CheckBox save = (CheckBox) findViewById(R.id.save_password);
 
         Notifi.setChecked(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,this));
-
-
-
         Notifi.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -76,10 +75,21 @@ public class SettingsActivity extends AppCompatActivity {
                 else {
                     Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,false,getApplicationContext());
                 }
-         //  NotificationChecker();
+            }
+        });
 
+        ForceLogin.setChecked(Utils.getprefBool(MyApplication.FORCE_LOGIN,this));
+        ForceLogin.setOnClickListener(new View.OnClickListener() {
 
-
+            @Override
+            public void onClick(View v) {
+                //is chkIos checked?
+                if (((CheckBox) v).isChecked()) {
+                    Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,getApplicationContext());
+                }
+                else {
+                    Utils.saveprefBool(MyApplication.FORCE_LOGIN,false,getApplicationContext());
+                }
             }
         });
         save.setOnClickListener(new View.OnClickListener() {

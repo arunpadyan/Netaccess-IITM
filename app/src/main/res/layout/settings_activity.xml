@@ -19,6 +19,16 @@
         android:text="Allow app to track  information like crash reports and user events for future improvements in the app. "
         android:textSize="16dp"
         android:gravity="top" />
+    <CheckBox
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/forcelogin"
+        android:layout_gravity="right"
+        android:layout_margin="10dp"
+        android:checked="false"
+        android:text="Force login (will reset connection)"
+        android:textSize="16dp"
+        android:gravity="top" />
 
     <CheckBox
         android:layout_width="fill_parent"

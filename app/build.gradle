@@ -10,8 +10,8 @@ android {
         applicationId "me.arunpadiyan.netaccess"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 19
-        versionName "1.4.3"
+        versionCode 21
+        versionName "1.4.4"
     }
     buildTypes {
         release {

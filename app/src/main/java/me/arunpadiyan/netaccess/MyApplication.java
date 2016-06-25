@@ -9,33 +9,12 @@ import android.graphics.Typeface;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.firebase.FirebaseApp;
 
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import org.jsoup.select.Evaluator;
-
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class MyApplication extends Application {
+    public static final String FORCE_LOGIN = "force_login";
     private static Application instance;
     public static final String TAG = "MyApplication";
     public static final String USER_NAME = "user_name";
