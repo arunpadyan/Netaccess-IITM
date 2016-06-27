@@ -69,7 +69,9 @@ public class AuthService extends Service {
         allowDestroy = false;
         mContext = this;
         queue = Volley.newRequestQueue(this);
-
+        /*Toast.makeText(mContext
+                ,"You already have net access,if you want force " +
+                        "login you can change in settings",Toast.LENGTH_LONG).show();*/
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         NewFirewallAuth();
@@ -116,7 +118,8 @@ public class AuthService extends Service {
         }
         t.cancel();
         if (!allowDestroy) {
-            startService(new Intent(this, AuthService.class));
+            Intent intent = new Intent("com.android.launchService");
+            sendBroadcast(intent);
         } else {
             Log.d("AuthService", "onDestroyed auth count : " + Integer.toString(keepAliveCount));
         }
@@ -175,6 +178,10 @@ public class AuthService extends Service {
                     Log.d(TAG, function + " :" + "ResponseCode :" + Integer.toString(mStatusCode));
                     if(Utils.getprefBool(MyApplication.FORCE_LOGIN,mContext)){
                         AuthLogOut();
+                    }else {
+                        Toast.makeText(mContext
+                                ,"You already have net access,if you want force " +
+                                        "login you can change in settings",Toast.LENGTH_LONG).show();
                     }
                 }
                 return super.parseNetworkResponse(response);

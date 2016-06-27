@@ -29,11 +29,14 @@
         <receiver android:name=".MainActivity$switchButtonListener" />
         <receiver android:name=".MyApplication$WifiReceiver">
             <intent-filter android:priority="100">
-                <action android:name="android.net.wifi.STATE_CHANGE" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
-
+        <receiver android:name=".MyApplication$StartService" >
+            <intent-filter>
+                <action android:name="com.android.launchService" />
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">

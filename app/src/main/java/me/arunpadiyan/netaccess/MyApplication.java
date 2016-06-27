@@ -97,24 +97,24 @@ public class MyApplication extends Application {
 
 
 
-                if(!thredActive){
+               /* if(!thredActive){
                     ThreadB threadB = new ThreadB();
                     threadB.start();
                     thredActive = true;
-                }
+                }*/
                 if (info.isConnected()) {
                     if (!Utils.getprefBool("notifcation_login",context)) MainActivity.createNotification(context);
-                    Log.d(TAG, "connected temp");
-
-                    Utils.saveprefBool("network",true,getContext());
+                    Log.d(TAG, "connected");
+                    if(Utils.getprefBool(VALID_PASS,context) && Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)){
+                        ((MyApplication) context.getApplicationContext()).startAuthService();
+                    }
                 } else {
                   //  if (Utils.getprefBool("notifcation_login",context)) MainActivity.createNotification(context);
                     String ns = Context.NOTIFICATION_SERVICE;
                     NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
                     nMgr.cancel(1);
-
-                    Log.d(TAG, "disconnected temp");
-                    Utils.saveprefBool("network",false,getContext());
+                    Log.d(TAG, "disconnected");
+                    ((MyApplication) context.getApplicationContext()).stopAuthService();
                 }
             }
         }
@@ -153,5 +153,14 @@ public class MyApplication extends Application {
         return mFontCabinRegular;
     }
 
+    public class StartService extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("Service Stops", "Ohhhhhhh");
+                startAuthService();
+            }
+
+    }
 
 }
