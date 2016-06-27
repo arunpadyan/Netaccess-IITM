@@ -200,6 +200,7 @@ public class MainActivity extends ActionBarActivity implements
         approve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                NotificationChecker();
                 if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
                     if (requstGoing) new Login().execute();
                 }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
@@ -220,6 +221,8 @@ public class MainActivity extends ActionBarActivity implements
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                NotificationChecker();
+
                 if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
                     if (requstGoing) new Login().execute();
                 }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){

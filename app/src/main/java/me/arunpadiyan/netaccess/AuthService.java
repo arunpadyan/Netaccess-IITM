@@ -4,7 +4,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,7 +36,7 @@ import java.util.regex.Pattern;
 public class AuthService extends Service {
 
     public static final String TAG = "AuthService";
-    public static int KEEP_AIVE_REFRESH = 1000 * 480;
+    public static int KEEP_AIVE_REFRESH = 1000 * 360;
 
     public static boolean allowDestroy = false;
     Context mContext;
@@ -179,9 +181,15 @@ public class AuthService extends Service {
                     if(Utils.getprefBool(MyApplication.FORCE_LOGIN,mContext)){
                         AuthLogOut();
                     }else {
-                        Toast.makeText(mContext
-                                ,"You already have net access,if you want force " +
-                                        "login you can change in settings",Toast.LENGTH_LONG).show();
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext
+                                        ,"You already have net access,if you want force " +
+                                                "login you can change in settings",Toast.LENGTH_LONG).show();
+                            }
+                        });
+
                     }
                 }
                 return super.parseNetworkResponse(response);

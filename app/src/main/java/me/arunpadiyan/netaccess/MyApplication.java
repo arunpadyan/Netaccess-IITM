@@ -153,12 +153,12 @@ public class MyApplication extends Application {
         return mFontCabinRegular;
     }
 
-    public class StartService extends BroadcastReceiver {
+    public static class StartService extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.i("Service Stops", "Ohhhhhhh");
-                startAuthService();
+            ((MyApplication) context.getApplicationContext()).startAuthService();
             }
 
     }
