@@ -12,4 +12,7 @@
 
     <color name="gplus_pressed">#563b5998</color>
     <color name="email_pressed">#5a00c345</color>
+
+    <color name="gplus_pressed1">#303030</color>
+
 </resources>

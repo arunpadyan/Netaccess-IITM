@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@color/gplus_pressed1"/>
+
+    <item
+        android:top="40dp"
+        android:left="100dp"
+        android:bottom="40dp"
+        android:right="100dp">
+
+        <bitmap
+
+            android:gravity="center"
+            android:src="@drawable/logo"/>
+
+    </item>
+
+</layer-list>

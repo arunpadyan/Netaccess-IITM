@@ -123,7 +123,7 @@ public class MainActivity extends ActionBarActivity implements
 
 
         //the intent that is started when the notification is clicked (works)
-        Intent notificationIntent = new Intent(cont, MainActivity.class);
+        Intent notificationIntent = new Intent(cont, SplashActivity.class);
         PendingIntent pendingNotificationIntent = PendingIntent.getActivity(cont, 0, notificationIntent, 0);
 
         notification.contentView = notificationView;

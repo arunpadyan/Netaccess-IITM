@@ -142,23 +142,27 @@ public class AuthService extends Service {
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse response = error.networkResponse;
                 if (response != null) {
-                    int mStatusCode = response.statusCode;
-                    String parsed;
                     try {
-                        parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                    } catch (UnsupportedEncodingException e) {
-                        parsed = new String(response.data);
-                    }
-                    Document doc = Jsoup.parse(parsed);
-                    Elements links = doc.select("a[href]");
-                    Log.d(TAG, function + " :" + links.get(0).attr("href"));
+                        int mStatusCode = response.statusCode;
+                        String parsed;
+                        try {
+                            parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                        } catch (UnsupportedEncodingException e) {
+                            parsed = new String(response.data);
+                        }
+                        Document doc = Jsoup.parse(parsed);
+                        Elements links = doc.select("a[href]");
+                        Log.d(TAG, function + " :" + links.get(0).attr("href"));
 
-                    Log.d(TAG, function + " Data :" + parsed);
-                    Log.d(TAG, function + " ResponseCode :" + Integer.toString(mStatusCode));
+                        Log.d(TAG, function + " Data :" + parsed);
+                        Log.d(TAG, function + " ResponseCode :" + Integer.toString(mStatusCode));
 
-                    if (mStatusCode != 204) {
-                        Log.d(TAG, " getMagic url :" + links.get(0).attr("href"));
-                        getMagic(links.get(0).attr("href"));
+                        if (mStatusCode != 204) {
+                            Log.d(TAG, " getMagic url :" + links.get(0).attr("href"));
+                            getMagic(links.get(0).attr("href"));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 } else {
                     Log.d(TAG, function + " network error");
