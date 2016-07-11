@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 public class AuthService extends Service {
 
     public static final String TAG = "AuthService";
-    public static int KEEP_AIVE_REFRESH = 1000 * 360;
+    public static int KEEP_AIVE_REFRESH = 1000 * 290;
 
     public static boolean allowDestroy = false;
     Context mContext;
@@ -71,6 +71,9 @@ public class AuthService extends Service {
         allowDestroy = false;
         mContext = this;
         queue = Volley.newRequestQueue(this);
+
+        if (!Utils.getprefBool("notifcation_login",mContext)) startForeground(1,MainActivity.createNotification(mContext));
+
         /*Toast.makeText(mContext
                 ,"You already have net access,if you want force " +
                         "login you can change in settings",Toast.LENGTH_LONG).show();*/

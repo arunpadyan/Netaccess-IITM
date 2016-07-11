@@ -54,6 +54,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -114,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements
         imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
-    public static void createNotification(Context cont) {
+    public static Notification createNotification(Context cont) {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager = (NotificationManager) cont.getSystemService(ns);
 
@@ -141,6 +143,7 @@ public class MainActivity extends ActionBarActivity implements
         notificationView.setOnClickPendingIntent(R.id.imageButton, pendingSwitchIntent);
 
         notificationManager.notify(1, notification);
+        return notification;
     }
 
     @Override
@@ -166,7 +169,9 @@ public class MainActivity extends ActionBarActivity implements
             // showCustomDialog();
 
         }
-
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+        myRef.setValue("Hello, World!");
         context = this;
         setContentView(R.layout.activity_main);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
