@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -92,8 +93,10 @@ public class MyApplication extends Application {
     public static class WifiReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-            if (info != null) {
+            ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if (mWifi != null) {
 
 
 
@@ -102,7 +105,7 @@ public class MyApplication extends Application {
                     threadB.start();
                     thredActive = true;
                 }*/
-                if (info.isConnected()) {
+                if (mWifi.isConnected()) {
                     if (!Utils.getprefBool("notifcation_login",context)) MainActivity.createNotification(context);
                     Log.d(TAG, "connected");
                     if(Utils.getprefBool(VALID_PASS,context) && Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)){
