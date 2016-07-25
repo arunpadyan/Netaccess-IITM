@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimaryDark" />
 
-    <CheckBox
+    <android.support.v7.widget.AppCompatCheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/trackData"
@@ -18,19 +18,28 @@
         android:checked="false"
         android:text="Allow app to track  information like crash reports and user events for future improvements in the app. "
         android:textSize="16dp"
-        android:gravity="top" />
-    <CheckBox
+        android:gravity="top|fill_vertical" />
+    <android.support.v7.widget.AppCompatCheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/forcelogin"
-        android:layout_gravity="right"
+        android:layout_gravity="right|center_horizontal"
         android:layout_margin="10dp"
         android:checked="false"
         android:text="Force login (will reset connection)"
         android:textSize="16dp"
-        android:gravity="top" />
+        android:gravity="top|fill_vertical" />
 
-    <CheckBox
+    <android.support.v7.widget.AppCompatSeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar"
+        android:indeterminate="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:visibility="gone" />
+
+    <android.support.v7.widget.AppCompatCheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Save Password"
@@ -47,6 +56,7 @@
         android:text="Tip :if you are in hostel area disable netaccess login for faster authentication of firewall"
         android:id="@+id/textView3"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp" />
 
 </LinearLayout>
