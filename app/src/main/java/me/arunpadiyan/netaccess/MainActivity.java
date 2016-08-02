@@ -62,6 +62,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -79,6 +82,8 @@ import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import me.arunpadiyan.netaccess.Objects.EventBusLoading;
 
 
 public class MainActivity extends ActionBarActivity implements
@@ -232,7 +237,12 @@ public class MainActivity extends ActionBarActivity implements
                 }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
                     if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
                   //      ((MyApplication) getApplicationContext()).stopAuthService();
-                        ((MyApplication) getApplicationContext()).startAuthService();
+                        if(Utils.isNetworkAvailable(MainActivity.this)){
+                            ((MyApplication) getApplicationContext()).startAuthService();
+                        }else {
+                            Toast.makeText(MainActivity.this,"No internet connection",Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                 }
 
@@ -351,6 +361,25 @@ public class MainActivity extends ActionBarActivity implements
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(EventBusLoading event) {
+        if(event != null){
+            mSwipeRefreshLayout.setRefreshing(event.isLoading);
+        }
+    }
+
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(getString(R.string.my_device_id))
@@ -435,19 +464,7 @@ public class MainActivity extends ActionBarActivity implements
     }
 
 
-    @Override
-    protected void onStart() {
-        // TODO Auto-generated method stub
-        super.onStart();
-        //GoogleAnalytics.getInstance(MainActivity.this).reportActivityStart(this);
-    }
 
-    @Override
-    protected void onStop() {
-        // TODO Auto-generated method stub
-        super.onStop();
-       // GoogleAnalytics.getInstance(MainActivity.this).reportActivityStop(this);
-    }
 
     @Override
     protected void onResume() {

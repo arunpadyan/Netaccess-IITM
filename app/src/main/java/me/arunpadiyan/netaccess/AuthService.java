@@ -21,6 +21,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -32,6 +33,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import me.arunpadiyan.netaccess.Objects.EventBusLoading;
 
 public class AuthService extends Service {
 
@@ -46,10 +49,10 @@ public class AuthService extends Service {
     public static boolean isStarted = false;
     Timer t;
     long startTime = System.currentTimeMillis();
-
+    EventBus eventBus;
     public AuthService() {
         t = new Timer();
-
+        eventBus = EventBus.getDefault();
     }
 
     @Override
@@ -92,6 +95,7 @@ public class AuthService extends Service {
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                eventBus.post(new EventBusLoading(true));
                 keepAliveCount += 1;
                 long endTime = System.currentTimeMillis();
                 Log.d("AuthService", "keepAliveCount : " + Integer.toString(keepAliveCount));
@@ -169,7 +173,7 @@ public class AuthService extends Service {
                     }
                 } else {
                     Log.d(TAG, function + " network error");
-
+                    eventBus.post(new EventBusLoading(false));
                 }
             }
         }) {
@@ -191,9 +195,9 @@ public class AuthService extends Service {
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
+                                eventBus.post(new EventBusLoading(false));
                                 Toast.makeText(mContext
-                                        ,"You already have net access,if you want force " +
-                                                "login you can change in settings",Toast.LENGTH_LONG).show();
+                                        ,"You already have net access",Toast.LENGTH_LONG).show();
                             }
                         });
 
@@ -238,6 +242,7 @@ public class AuthService extends Service {
 
     //for logout
     private void AuthLogOut() {
+        eventBus.post(new EventBusLoading(true));
         final String url = Utils.getprefString(MyApplication.LOG_OUT, mContext);
         final String function = "AuthLogOut";
         final String[] magic = {""};
@@ -255,6 +260,7 @@ public class AuthService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                eventBus.post(new EventBusLoading(false));
                 NetworkResponse response = error.networkResponse;
                 Log.d(TAG, " getMagic error :" + error.toString());
             }
@@ -264,6 +270,7 @@ public class AuthService extends Service {
 
     //for keep alive auth
     public void KeepAlive(final String url) {
+        eventBus.post(new EventBusLoading(true));
         final String[] magic = {""};
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -274,6 +281,7 @@ public class AuthService extends Service {
                         params.putString("context", TAG);
                         mFirebaseAnalytics.logEvent("KeepAlive", params);
                         Log.d(TAG, " KeepAlive:" + url);
+                        eventBus.post(new EventBusLoading(false));
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -312,7 +320,7 @@ public class AuthService extends Service {
                     @Override
                     public void onResponse(String response) {
                         //   Log.d(TAG", response);
-
+                        eventBus.post(new EventBusLoading(false));
                         String logout = getRegexString("location.href=\"(.+?logout.+?)\"", response);
                         String keepalive = getRegexString("location.href=\"(.+?keepalive.+?)\"", response);
 
@@ -348,7 +356,7 @@ public class AuthService extends Service {
                     params.putString("context", TAG);
                     mFirebaseAnalytics.logEvent("NewFirewallAuthLogin", params);
                 }
-
+                eventBus.post(new EventBusLoading(false));
                 NetworkResponse response = error.networkResponse;
                 Log.d(TAG, error.toString());
                 //  int mStatusCode = response.statusCode;
