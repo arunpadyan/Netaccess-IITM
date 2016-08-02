@@ -17,7 +17,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+
 public class AboutActivity extends AppCompatActivity {
+
+    InterstitialAd mInterstitialAd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +38,18 @@ public class AboutActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         getSupportActionBar().setTitle("About");
+
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5514295486090543/9225342517");
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                //requestNewInterstitial();
+                finish();
+            }
+        });
+        requestNewInterstitial();
 
         LinearLayout dev = (LinearLayout) findViewById(R.id.developer);
         dev.setOnClickListener(new View.OnClickListener() {
@@ -47,12 +66,31 @@ public class AboutActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(getString(R.string.my_device_id))
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+       // super.onBackPressed();
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            finish();
+        }
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }

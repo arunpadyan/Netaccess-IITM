@@ -46,8 +46,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
@@ -73,6 +75,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends ActionBarActivity implements
@@ -97,6 +103,7 @@ public class MainActivity extends ActionBarActivity implements
     MyApplication mApp;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private InterstitialAd mInterstitialAd;
 
     /**
      * @return Application's version code from the {@code PackageManager}.
@@ -180,11 +187,15 @@ public class MainActivity extends ActionBarActivity implements
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-5514295486090543~8789911718");
+
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest request = new AdRequest.Builder()
                 .addTestDevice("98E9534D9298ECC93E2F46F2D815F745")
                 .build();
         mAdView.loadAd(request);
+
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         CookieHandler.setDefault(cm);
@@ -324,7 +335,40 @@ public class MainActivity extends ActionBarActivity implements
                             }
                         });
         Log.d("MainActivity",Utils.getCertificateSHA1Fingerprint(this));
+
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5514295486090543/7748609313");
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                //requestNewInterstitial();
+                finish();
+            }
+        });
+        requestNewInterstitial();
+
+
     }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(getString(R.string.my_device_id))
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // super.onBackPressed();
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            finish();
+        }
+    }
+
     private void AuthLogOut( ) {
         final String url =Utils.getprefString(MyApplication.LOG_OUT,this);
         final String function = "AuthLogOut" ;

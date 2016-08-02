@@ -61,4 +61,5 @@
 
     </menu>
     <string name="invitation_message">Ever felt tired of having to log into netaccess site every now and then? The NetAccess App helps you login into netacess directly from the notification drawer </string>
+    <string name="my_device_id">98E9534D9298ECC93E2F46F2D815F745</string>
 </resources>

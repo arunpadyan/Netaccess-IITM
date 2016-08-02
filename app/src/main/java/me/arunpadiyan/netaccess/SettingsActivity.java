@@ -15,6 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+
 import static me.arunpadiyan.netaccess.MainActivity.createNotification;
 
 /**
@@ -30,16 +34,19 @@ import static me.arunpadiyan.netaccess.MainActivity.createNotification;
  */
 public class SettingsActivity extends AppCompatActivity {
     /**
+     *
      * Determines whether to always show the simplified settings UI, where
      * settings are presented in a single list. When false, settings are shown
      * as a master/detail two-pane view on tablets. When true, a single pane is
      * shown on tablets.
      */
+
+    InterstitialAd mInterstitialAd;
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 return true;
         }
 
@@ -109,7 +116,38 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
 
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-5514295486090543/6850945718");
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                //requestNewInterstitial();
+                finish();
+            }
+        });
+        requestNewInterstitial();
+
+
     }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(getString(R.string.my_device_id))
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // super.onBackPressed();
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            finish();
+        }
+    }
+
     public static void saveBool(String key, Boolean value){
         SharedPreferences pref = MyApplication.getContext().getSharedPreferences("MyPref", 1); // 0 - for private mode
         SharedPreferences.Editor editor = pref.edit();

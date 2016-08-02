@@ -186,7 +186,7 @@ public class AuthService extends Service {
                     Log.d(TAG, function + " :" + "Data :" + parsed);
                     Log.d(TAG, function + " :" + "ResponseCode :" + Integer.toString(mStatusCode));
                     if(Utils.getprefBool(MyApplication.FORCE_LOGIN,mContext)){
-                        AuthLogOut();
+                      //  AuthLogOut();
                     }else {
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override

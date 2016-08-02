@@ -10,7 +10,7 @@ android {
         applicationId "me.arunpadiyan.netaccess"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 26
+        versionCode 27
         versionName "1.4.9"
     }
     buildTypes {
@@ -40,6 +40,6 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.7'
     compile 'org.jsoup:jsoup:1.7.3'
-    compile 'com.mcxiaoke.volley:library:1.0.19'
+    compile 'com.android.volley:volley:1.0.0'
 
 }

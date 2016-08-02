@@ -28,7 +28,8 @@
         android:checked="false"
         android:text="Force login (will reset connection)"
         android:textSize="16dp"
-        android:gravity="top|fill_vertical" />
+        android:gravity="top|fill_vertical"
+        android:visibility="gone" />
 
     <android.support.v7.widget.AppCompatSeekBar
         android:layout_width="match_parent"

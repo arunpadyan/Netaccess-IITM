@@ -155,18 +155,6 @@
                     android:paddingBottom="8dp"
                     android:id="@+id/devloper">
 
-                    <ImageButton
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:id="@+id/developer_icon"
-                        android:layout_gravity="center_vertical|left"
-                        android:onClick="onClick"
-                        android:scaleType="centerCrop"
-                        style="@android:style/Widget.DeviceDefault.Light.Button.Borderless.Small"
-                        android:background="@drawable/dev_icon_bg"
-                        android:src="@drawable/dev_icon"
-                        android:visibility="gone" />
-
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="fill_parent"
