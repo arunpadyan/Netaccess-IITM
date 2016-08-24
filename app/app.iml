@@ -106,6 +106,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-analytics-impl/9.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-analytics/9.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-common/9.2.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-config/9.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-core/9.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-crash/9.2.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-database-connection/9.2.0/jars" />
@@ -156,6 +157,7 @@
     <orderEntry type="library" exported="" name="support-vector-drawable-24.0.0" level="project" />
     <orderEntry type="library" exported="" name="eventbus-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-database-connection-9.2.0" level="project" />
+    <orderEntry type="library" exported="" name="firebase-config-9.2.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-analytics-impl-9.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appinvite-9.2.0" level="project" />
     <orderEntry type="library" exported="" name="volley-1.0.0" level="project" />

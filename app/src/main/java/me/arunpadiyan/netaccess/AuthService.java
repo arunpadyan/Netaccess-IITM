@@ -35,11 +35,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.arunpadiyan.netaccess.Objects.EventBusLoading;
+import me.arunpadiyan.netaccess.Objects.EventBusSuccess;
 
 public class AuthService extends Service {
 
     public static final String TAG = "AuthService";
-    public static int KEEP_AIVE_REFRESH = 1000 * 290;
+    public static int KEEP_AIVE_REFRESH = 1000 * 240;
 
     public static boolean allowDestroy = false;
     Context mContext;
@@ -50,6 +51,7 @@ public class AuthService extends Service {
     Timer t;
     long startTime = System.currentTimeMillis();
     EventBus eventBus;
+    MyApplication mApp;
     public AuthService() {
         t = new Timer();
         eventBus = EventBus.getDefault();
@@ -72,10 +74,12 @@ public class AuthService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // mApp = (MyApplication) getApplicationContext();
         allowDestroy = false;
+        mApp =(MyApplication) getApplication();
         mContext = this;
         queue = Volley.newRequestQueue(this);
 
-        if (!Utils.getprefBool("notifcation_login",mContext)) startForeground(1,MainActivity.createNotification(mContext));
+        if (!Utils.getprefBool("notifcation_login",mApp) && Utils.isNetworkAvailable(mApp))
+            startForeground(1,MainActivity.createNotification(mContext));
 
         /*Toast.makeText(mContext
                 ,"You already have net access,if you want force " +
@@ -202,6 +206,8 @@ public class AuthService extends Service {
                         });
 
                     }
+                    eventBus.post(new EventBusSuccess(true));
+
                 }
                 return super.parseNetworkResponse(response);
             }

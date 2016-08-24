@@ -68,26 +68,6 @@ public class MyApplication extends Application {
     public static android.content.Context getContext() {
         return instance.getApplicationContext();
     }
-   /* synchronized Tracker getTracker(TrackerName trackerId) {
-        if (!mTrackers.containsKey(trackerId)) {
-
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            Tracker t = (trackerId == TrackerName.APP_TRACKER) ? analytics.newTracker("UA-61389535-1")
-                    : (trackerId == TrackerName.GLOBAL_TRACKER) ? analytics.newTracker(R.xml.global_tracker)
-                    : analytics.newTracker(R.xml.ecommerce_tracker);
-            mTrackers.put(trackerId, t);
-
-        }
-        return mTrackers.get(trackerId);
-    }*/
-    public enum TrackerName {
-        APP_TRACKER, // Tracker used only in this app.
-        GLOBAL_TRACKER, // Tracker used by all the apps from a company. eg: roll-up tracking.
-        ECOMMERCE_TRACKER, // Tracker used by all ecommerce transactions from a company.
-    }
-
-    //HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
-
 
 
     public static class WifiReceiver extends BroadcastReceiver {
@@ -106,7 +86,7 @@ public class MyApplication extends Application {
                     thredActive = true;
                 }*/
                 if (mWifi.isConnected()) {
-                    if (!Utils.getprefBool("notifcation_login",context)) MainActivity.createNotification(context);
+                   // if (!Utils.getprefBool("notifcation_login",context)) MainActivity.createNotification(context);
                     Log.d(TAG, "connected");
                     if(Utils.getprefBool(VALID_PASS,context) && Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)){
                         ((MyApplication) context.getApplicationContext()).startAuthService();

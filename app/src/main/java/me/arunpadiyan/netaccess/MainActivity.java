@@ -84,6 +84,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import me.arunpadiyan.netaccess.Objects.EventBusLoading;
+import me.arunpadiyan.netaccess.Objects.EventBusSuccess;
 
 
 public class MainActivity extends ActionBarActivity implements
@@ -109,6 +110,8 @@ public class MainActivity extends ActionBarActivity implements
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAnalytics mFirebaseAnalytics;
     private InterstitialAd mInterstitialAd;
+
+    private InterstitialAd mInterstitialAd2;
 
     /**
      * @return Application's version code from the {@code PackageManager}.
@@ -274,9 +277,9 @@ public class MainActivity extends ActionBarActivity implements
         CheckBox cbService = (CheckBox) findViewById(R.id.service);
         CheckBox cbNetAccess = (CheckBox) findViewById(R.id.netacces);
 
-        Notifi.setChecked(!Utils.getprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED,context));
-        cbService.setChecked(Utils.getprefBool(MyApplication.SERVICE_ENABLED,context));
-        cbNetAccess.setChecked(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context));
+        Notifi.setChecked(!Utils.getprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED,mApp));
+        cbService.setChecked(Utils.getprefBool(MyApplication.SERVICE_ENABLED,mApp));
+        cbNetAccess.setChecked(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,mApp));
 
         cbService.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,9 +288,9 @@ public class MainActivity extends ActionBarActivity implements
                 if (((CheckBox) v).isChecked()) {
                  //   ((MyApplication) getApplicationContext()).stopAuthService();
                     ((MyApplication) getApplicationContext()).startAuthService();
-                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true,context);
+                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true,mApp);
                 } else {
-                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, false,context);
+                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, false,mApp);
                     ((MyApplication) getApplicationContext()).stopAuthService();
                 }
                 NotificationChecker();
@@ -300,9 +303,9 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, false,context);
+                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, false,mApp);
                 } else {
-                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, true,context);
+                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, true,mApp);
                 }
                 NotificationChecker();
             }
@@ -314,9 +317,9 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, true,context);
+                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, true,mApp);
                 } else {
-                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, false,context);
+                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, false,mApp);
                 }
               //  NotificationChecker();
             }
@@ -359,6 +362,15 @@ public class MainActivity extends ActionBarActivity implements
         requestNewInterstitial();
 
 
+        mInterstitialAd2 = new InterstitialAd(this);
+        mInterstitialAd2.setAdUnitId("ca-app-pub-5514295486090543/7559819315");
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(getString(R.string.my_device_id))
+                .build();
+
+        mInterstitialAd2.loadAd(adRequest);
+
+
     }
 
     @Override
@@ -377,6 +389,15 @@ public class MainActivity extends ActionBarActivity implements
     public void onMessageEvent(EventBusLoading event) {
         if(event != null){
             mSwipeRefreshLayout.setRefreshing(event.isLoading);
+
+
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(EventBusSuccess event) {
+        if(event != null){
+            mInterstitialAd2.show();
         }
     }
 
@@ -436,26 +457,23 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     public void NotificationChecker() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        // if no network is available networkInfo will be null
-        // otherwise check if we are connected
-        if (networkInfo != null && networkInfo.isConnected()) {
-            if (!Utils.getprefBool("notifcation_login",context) && Utils.getprefBool(mApp.VALID_PASS,context)) {
-                createNotification(MyApplication.getContext());
-                Log.d("1", "here");
+        if (Utils.isNetworkAvailable(mApp)) {
+            if (!Utils.getprefBool("notifcation_login",mApp) && Utils.getprefBool(mApp.VALID_PASS,context)) {
+
+                mApp.startAuthService();
+                Log.d("connected", "notif");
             } else {
                 String ns = Context.NOTIFICATION_SERVICE;
-
                 NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
-                nMgr.cancel(1);
+                if(isNotificationVisible())
+               mApp.stopAuthService();
+                Log.d("connected", "no_notif");
             }
             Log.d("connected", "fucker");
-            // Do your workateNotification();
+
         } else {
             Log.d("disconnected", "fucker");
             String ns = Context.NOTIFICATION_SERVICE;
-
             NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
             nMgr.cancel(1);
         }
@@ -465,6 +483,11 @@ public class MainActivity extends ActionBarActivity implements
 
 
 
+    private boolean isNotificationVisible() {
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        PendingIntent test = PendingIntent.getActivity(context, 1, notificationIntent, PendingIntent.FLAG_NO_CREATE);
+        return test != null;
+    }
 
     @Override
     protected void onResume() {
