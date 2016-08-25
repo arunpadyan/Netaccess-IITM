@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
@@ -35,6 +36,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -215,7 +217,7 @@ public class MainActivity extends ActionBarActivity implements
 
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setTitle("NETACCESS");
+            getSupportActionBar().setTitle("");
         }
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark);
@@ -398,6 +400,11 @@ public class MainActivity extends ActionBarActivity implements
     public void onMessageEvent(EventBusSuccess event) {
         if(event != null){
             mInterstitialAd2.show();
+            if(event.isSuccess){
+                ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_green));
+            }else {
+                ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_red));
+            }
         }
     }
 

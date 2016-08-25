@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#520c28</color>
-    <color name="colorPrimaryDark">#FF440C20</color>
+    <color name="colorPrimary">#252525</color>
+    <color name="colorPrimaryDark">#1d1d1d</color>
     <color name="colorPrimaryDark1">#ff00066b</color>
 
     <color name="notification_settings_time_picker_bg_default">#fff</color>
@@ -10,9 +10,10 @@
 
     <color name="white">#ffffff</color>
 
+    <color name="bg">#393939</color>
     <color name="gplus_pressed">#563b5998</color>
     <color name="email_pressed">#5a00c345</color>
 
-    <color name="gplus_pressed1">#303030</color>
+    <color name="gplus_pressed1">#393939</color>
 
 </resources>

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -131,7 +130,7 @@ public class MyApplication extends Application {
 
     public Typeface getFjordOneRegular() {
         if (mFontCabinRegular == null) {
-            mFontCabinRegular = Typeface.createFromAsset(this.getAssets(), "fonts/Montserrat-Regular.otf");
+            mFontCabinRegular = Typeface.createFromAsset(this.getAssets(), "fonts/logo_font.ttf");
         }
         return mFontCabinRegular;
     }

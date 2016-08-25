@@ -13,7 +13,7 @@
         <bitmap
 
             android:gravity="center"
-            android:src="@drawable/logo"/>
+            android:src="@drawable/firewall_login_cover"/>
 
     </item>
 
