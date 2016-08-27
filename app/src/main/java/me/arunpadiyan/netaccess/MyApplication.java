@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.google.firebase.FirebaseApp;
@@ -33,7 +34,7 @@ public class MyApplication extends Application {
 
     public static boolean thredActive = false;
     RequestQueue queue;
-
+    Toast mToast ;
 
     Context mContext ;
 
@@ -64,6 +65,13 @@ public class MyApplication extends Application {
 
     }
 
+    public void showToast(String text){
+        if(mToast == null){
+            mToast = Toast.makeText(mContext, text, Toast.LENGTH_LONG);
+        }
+        mToast.setText(text);
+        mToast.show();
+    }
     public static android.content.Context getContext() {
         return instance.getApplicationContext();
     }

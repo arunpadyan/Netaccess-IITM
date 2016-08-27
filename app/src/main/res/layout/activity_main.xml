@@ -48,19 +48,37 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:gravity="center_horizontal"
                 android:layout_alignParentBottom="true">
-                <ImageView
+                <FrameLayout
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:src="@drawable/logo_red"
+                    android:id="@+id/logo_container"
                     android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:id="@+id/logo" />
+                    android:layout_centerHorizontal="true">
+                    <View
+                        android:background="@drawable/circle_red"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                    <me.arunpadiyan.netaccess.Objects.CircleView
+                        android:id="@+id/green_border"
+                        android:background="@drawable/circle_green"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/knight_only"
+
+                        android:id="@+id/logo" />
+
+
+                </FrameLayout>
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/username_text_input_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/logo"
+                    android:layout_below="@+id/logo_container"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true">
 

@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -200,8 +199,8 @@ public class AuthService extends Service {
                             @Override
                             public void run() {
                                 eventBus.post(new EventBusLoading(false));
-                                Toast.makeText(mContext
-                                        ,"You already have net access",Toast.LENGTH_LONG).show();
+                                mApp.showToast("You already have net access");
+
                             }
                         });
 
@@ -345,8 +344,9 @@ public class AuthService extends Service {
                         Log.d(TAG, "logout link : " + logout);
                         Log.d(TAG, "keepalive link : " + keepalive);
                         if (logout.trim().length() > 10) {
-                            Toast.makeText(mContext, "Firewall Authentication successful \n using rollno : "
-                                    + Utils.getprefString(MyApplication.USER_NAME, mContext), Toast.LENGTH_LONG).show();
+                            mApp.showToast("Firewall Authentication successful \n using rollno : "
+                                    + Utils.getprefString(MyApplication.USER_NAME, mContext));
+
                         }
 
                     }

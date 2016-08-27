@@ -12,17 +12,15 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,11 +34,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -80,16 +75,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
+import me.arunpadiyan.netaccess.Objects.CircleView;
 import me.arunpadiyan.netaccess.Objects.EventBusLoading;
 import me.arunpadiyan.netaccess.Objects.EventBusSuccess;
 
 
-public class MainActivity extends ActionBarActivity implements
+public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener {
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
@@ -112,60 +104,12 @@ public class MainActivity extends ActionBarActivity implements
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAnalytics mFirebaseAnalytics;
     private InterstitialAd mInterstitialAd;
-
+    CircleView greenCircle;
     private InterstitialAd mInterstitialAd2;
 
     /**
      * @return Application's version code from the {@code PackageManager}.
      */
-
-    private static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
-    }
-
-
-    public static void hideSoftKeyboard(ActionBarActivity activity, View view) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
-    }
-
-    public static Notification createNotification(Context cont) {
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager notificationManager = (NotificationManager) cont.getSystemService(ns);
-
-        Notification notification = new Notification(R.drawable.ic_launcher_notif, null, System.currentTimeMillis());
-        RemoteViews notificationView = new RemoteViews(cont.getPackageName(), R.layout.notification_layout);
-
-
-        //the intent that is started when the notification is clicked (works)
-        Intent notificationIntent = new Intent(cont, SplashActivity.class);
-        PendingIntent pendingNotificationIntent = PendingIntent.getActivity(cont, 0, notificationIntent, 0);
-
-        notification.contentView = notificationView;
-        notification.contentIntent = pendingNotificationIntent;
-        notification.flags |= Notification.FLAG_ONGOING_EVENT;
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-        // notification.flags = Notification.VISIBILITY_PUBLIC;
-        //  notification.Builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-
-        //this is the intent that is supposed to be called when the button is clicked
-        Intent switchIntent = new Intent(MyApplication.getContext(), switchButtonListener.class);
-        switchIntent.putExtra("sdgfahg", notificationView);
-        PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(MyApplication.getContext(), 0, switchIntent, 0);
-
-        notificationView.setOnClickPendingIntent(R.id.imageButton, pendingSwitchIntent);
-
-        notificationManager.notify(1, notification);
-        return notification;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mApp = (MyApplication) getApplicationContext();
@@ -175,9 +119,9 @@ public class MainActivity extends ActionBarActivity implements
             Utils.saveprefBool(MyApplication.SERVICE_ENABLED,true,this);
             Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
             Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,this);
-          //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
+            //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
             Utils.saveprefBool("first_time_login1",true,this);
-           // showCustomDialog();
+            // showCustomDialog();
 
         }
         if(!Utils.getprefBool("first_time_login12",this)){
@@ -189,11 +133,16 @@ public class MainActivity extends ActionBarActivity implements
             // showCustomDialog();
 
         }
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("message");
         myRef.setValue("Hello, World!");
         context = this;
         setContentView(R.layout.activity_main);
+
+
+        greenCircle =(CircleView) findViewById(R.id.green_border);
+        greenCircle.animateArc(360,0,2000);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-5514295486090543~8789911718");
@@ -241,11 +190,12 @@ public class MainActivity extends ActionBarActivity implements
                     if (requstGoing) new Login().execute();
                 }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
                     if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                  //      ((MyApplication) getApplicationContext()).stopAuthService();
+                        //      ((MyApplication) getApplicationContext()).stopAuthService();
                         if(Utils.isNetworkAvailable(MainActivity.this)){
                             ((MyApplication) getApplicationContext()).startAuthService();
                         }else {
-                            Toast.makeText(MainActivity.this,"No internet connection",Toast.LENGTH_SHORT).show();
+                            mApp.showToast("No internet connection");
+
                         }
 
                     }
@@ -268,7 +218,7 @@ public class MainActivity extends ActionBarActivity implements
                     if (requstGoing) new Login().execute();
                 }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
                     if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                    //    ((MyApplication) getApplicationContext()).stopAuthService();
+                        //    ((MyApplication) getApplicationContext()).stopAuthService();
                         ((MyApplication) getApplicationContext()).startAuthService();
                     }
                 }
@@ -288,7 +238,7 @@ public class MainActivity extends ActionBarActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                 //   ((MyApplication) getApplicationContext()).stopAuthService();
+                    //   ((MyApplication) getApplicationContext()).stopAuthService();
                     ((MyApplication) getApplicationContext()).startAuthService();
                     Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true,mApp);
                 } else {
@@ -323,7 +273,7 @@ public class MainActivity extends ActionBarActivity implements
                 } else {
                     Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, false,mApp);
                 }
-              //  NotificationChecker();
+                //  NotificationChecker();
             }
         });
 
@@ -401,12 +351,28 @@ public class MainActivity extends ActionBarActivity implements
         if(event != null){
             mInterstitialAd2.show();
             if(event.isSuccess){
-                ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_green));
+                greenCircle.animateArc(0,360,2000);
+               // ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_green));
             }else {
-                ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_red));
+              //  ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_red));
             }
         }
     }
+
+    /*private void showGreenLogoBorder(){
+        ObjectAnimator anim = ObjectAnimator.ofFloat(findViewById(R.id.green_border), "sweepAngle", 0, 360);
+        anim.setDuration(1000);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
+        {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator)
+            {
+                // calling invalidate(); will trigger onDraw() to execute
+                invalidate();
+            }
+        });
+        anim.start();
+    }*/
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
@@ -426,6 +392,54 @@ public class MainActivity extends ActionBarActivity implements
         }
     }
 
+    private static int getAppVersion(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            // should never happen
+            throw new RuntimeException("Could not get package name: " + e);
+        }
+    }
+
+
+    public static void hideSoftKeyboard(ActionBarActivity activity, View view) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+    }
+
+    public static Notification createNotification(Context cont) {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager = (NotificationManager) cont.getSystemService(ns);
+
+        Notification notification = new Notification(R.drawable.ic_knight_firewall_only, null, System.currentTimeMillis());
+        RemoteViews notificationView = new RemoteViews(cont.getPackageName(), R.layout.notification_layout);
+
+
+        //the intent that is started when the notification is clicked (works)
+        Intent notificationIntent = new Intent(cont, SplashActivity.class);
+        PendingIntent pendingNotificationIntent = PendingIntent.getActivity(cont, 0, notificationIntent, 0);
+
+        notification.contentView = notificationView;
+        notification.contentIntent = pendingNotificationIntent;
+        notification.flags |= Notification.FLAG_ONGOING_EVENT;
+        notification.flags |= Notification.FLAG_NO_CLEAR;
+        // notification.flags = Notification.VISIBILITY_PUBLIC;
+        //  notification.Builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+
+        //this is the intent that is supposed to be called when the button is clicked
+        Intent switchIntent = new Intent(MyApplication.getContext(), switchButtonListener.class);
+        switchIntent.putExtra("sdgfahg", notificationView);
+        PendingIntent pendingSwitchIntent = PendingIntent.getBroadcast(MyApplication.getContext(), 0, switchIntent, 0);
+
+        notificationView.setOnClickPendingIntent(R.id.imageButton, pendingSwitchIntent);
+
+        notificationManager.notify(1, notification);
+        return notification;
+    }
+
+
     private void AuthLogOut( ) {
         final String url =Utils.getprefString(MyApplication.LOG_OUT,this);
         final String function = "AuthLogOut" ;
@@ -438,7 +452,8 @@ public class MainActivity extends ActionBarActivity implements
                         ((MyApplication) getApplicationContext()).stopAuthService();
 
                         Log.d(TAG ,function+" :response :"+response);
-                        Toast.makeText(context,"Logout successful",Toast.LENGTH_SHORT).show();
+                        mApp.showToast("Logout successful");
+
                         Bundle params = new Bundle();
                         params.putString("result", "success");
                         params.putString("context", "MainActivity");
@@ -699,8 +714,8 @@ public class MainActivity extends ActionBarActivity implements
                 toast = loginform.text();
 
             }
-            Toast.makeText(MyApplication.getContext(), toast,
-                    Toast.LENGTH_SHORT).show();
+            ((MyApplication) MyApplication.getContext()).showToast(toast);
+
 
         }
 
@@ -877,8 +892,7 @@ public class MainActivity extends ActionBarActivity implements
                         .setCategory("Login")
                         .setAction("fail")
                         .build());*/
-                Toast.makeText(getBaseContext(), "You are not connected to insti network",
-                        Toast.LENGTH_SHORT).show();
+                mApp.showToast("You are not connected to insti network");
                 Utils.saveprefBool("Network_error",false,context );
             }
             //new Approveve().execute();
