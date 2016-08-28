@@ -11,7 +11,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 30
-        versionName "2.0bg"
+        versionName "2.0"
     }
     buildTypes {
         release {
