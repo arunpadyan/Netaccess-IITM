@@ -18,12 +18,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fontName="fjord"
+            android:textColor="@color/white"
             android:textSize="24sp"
+            android:shadowColor="@color/logo_green"
+            android:shadowDx="0"
+            android:shadowDy="0"
+
             android:text="Firewall  "/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:textColor="@color/white"
             android:textSize="17sp"
             android:text="Login"/>
     </android.support.v7.widget.Toolbar>
@@ -54,22 +59,24 @@
                     android:id="@+id/logo_container"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true">
-                    <View
-                        android:background="@drawable/circle_red"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                    <me.arunpadiyan.netaccess.Objects.CircleView
-                        android:id="@+id/green_border"
-                        android:background="@drawable/circle_green"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        />
+
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/knight_only"
 
                         android:id="@+id/logo" />
+                    <me.arunpadiyan.netaccess.Objects.CircleView
+                        android:id="@+id/border2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
+                    <me.arunpadiyan.netaccess.Objects.CircleView
+                        android:id="@+id/border"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        />
+
 
 
                 </FrameLayout>
@@ -168,11 +175,16 @@
                     android:layout_height="wrap_content"
                     android:textSize="10dp"
                     android:autoLink="web"
-                    android:text="This ldap credentials won&apos;t be used any where else. Feel free to checkout source code  https://github.com/arunpadyan/netaccess-iitm"
+                    android:text=""
                     android:visibility="visible"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This ldap credentials won't be used any where else. Feel free to checkout source code  https://github.com/arunpadyan/netaccess-iitm"
+                    android:visibility="gone"/>
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/my_recycler_view"

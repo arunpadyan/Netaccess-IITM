@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
+    private static final int MODE_SUCCESS = 2;
+    private static final int MODE_FAILED = 1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_INVITE = 0;
@@ -104,7 +106,9 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAnalytics mFirebaseAnalytics;
     private InterstitialAd mInterstitialAd;
-    CircleView greenCircle;
+    CircleView Circle;
+    CircleView CircleBack;
+    int CurrentNetworkMode = 0;
     private InterstitialAd mInterstitialAd2;
 
     /**
@@ -141,8 +145,11 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
 
-        greenCircle =(CircleView) findViewById(R.id.green_border);
-        greenCircle.animateArc(360,0,2000);
+        Circle =(CircleView) findViewById(R.id.border);
+        CircleBack =(CircleView) findViewById(R.id.border2);
+
+        setNetworkMode(MODE_FAILED);
+
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-5514295486090543~8789911718");
@@ -325,6 +332,24 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    private void setNetworkMode(int mode){
+        if(CurrentNetworkMode != mode ){
+            if(mode == MODE_FAILED){
+                CircleBack.setColor(R.color.logo_green);
+                Circle.setColor(R.color.logo_red);
+                CircleBack.setSweepAngle(360);
+                Circle.animateArc(0,360,2000);
+            }else if(mode == MODE_SUCCESS){
+                CircleBack.setColor(R.color.logo_red);
+                Circle.setColor(R.color.logo_green);
+                CircleBack.setSweepAngle(360);
+                Circle.animateArc(0,360,2000);
+            }
+        }
+        CurrentNetworkMode = mode;
+
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -351,9 +376,10 @@ public class MainActivity extends AppCompatActivity implements
         if(event != null){
             mInterstitialAd2.show();
             if(event.isSuccess){
-                greenCircle.animateArc(0,360,2000);
+                setNetworkMode(MODE_SUCCESS);
                // ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_green));
             }else {
+                setNetworkMode(MODE_FAILED);
               //  ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_red));
             }
         }
@@ -453,6 +479,7 @@ public class MainActivity extends AppCompatActivity implements
 
                         Log.d(TAG ,function+" :response :"+response);
                         mApp.showToast("Logout successful");
+                        onMessageEvent(new EventBusSuccess(false));
 
                         Bundle params = new Bundle();
                         params.putString("result", "success");

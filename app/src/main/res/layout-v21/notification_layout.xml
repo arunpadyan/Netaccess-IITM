@@ -12,8 +12,8 @@
         android:background="@drawable/notification_icon_bg"
         android:layout_marginLeft="8dp">
         <ImageView
-            android:layout_width="17dp"
-            android:layout_height="17dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:id="@+id/imageView"
             android:src="@drawable/ic_knight_firewall_only"
             android:layout_centerVertical="true"
