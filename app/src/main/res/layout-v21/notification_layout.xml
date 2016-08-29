@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="FireWall Login"
+        android:text="Firewall Login"
         android:id="@+id/textView"
         android:gravity="center_vertical"
         android:textColor="#fd444444"
