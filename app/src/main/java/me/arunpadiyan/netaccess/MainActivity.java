@@ -475,7 +475,7 @@ public class MainActivity extends AppCompatActivity implements
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        ((MyApplication) getApplicationContext()).stopAuthService();
+                       // ((MyApplication) getApplicationContext()).stopAuthService();
 
                         Log.d(TAG ,function+" :response :"+response);
                         mApp.showToast("Logout successful");

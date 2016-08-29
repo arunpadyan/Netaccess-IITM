@@ -344,7 +344,7 @@ public class AuthService extends Service {
                         Log.d(TAG, "logout link : " + logout);
                         Log.d(TAG, "keepalive link : " + keepalive);
                         if (logout.trim().length() > 10) {
-                            mApp.showToast("Firewall Authentication successful \n using rollno : "
+                            mApp.showToast("Firewall Authentication successful \nusing rollno : "
                                     + Utils.getprefString(MyApplication.USER_NAME, mContext));
                             eventBus.post(new EventBusSuccess(true));
                         }

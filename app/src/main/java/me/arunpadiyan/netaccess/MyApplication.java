@@ -9,6 +9,10 @@ import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -35,6 +39,7 @@ public class MyApplication extends Application {
     public static boolean thredActive = false;
     RequestQueue queue;
     Toast mToast ;
+    TextView mToastText;
 
     Context mContext ;
 
@@ -66,10 +71,20 @@ public class MyApplication extends Application {
     }
 
     public void showToast(String text){
+
         if(mToast == null){
-            mToast = Toast.makeText(mContext, text, Toast.LENGTH_LONG);
+            View view;
+            LayoutInflater inflater = (LayoutInflater)   getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.toast_custom, null);
+             mToast = new Toast(getApplicationContext());
+            mToast.setDuration(Toast.LENGTH_LONG);
+            mToast.setGravity(Gravity.CENTER_VERTICAL | Gravity.BOTTOM, 0, (int) Utils.convertDpToPixel(40,mContext));
+            mToastText = (TextView) view.findViewById(R.id.text);
+            mToastText.setTypeface(getMontserrat());
+            mToast.setView(view);//setting the view of custom toast layout
         }
-        mToast.setText(text);
+
+        mToastText.setText(text);
         mToast.show();
     }
     public static android.content.Context getContext() {
@@ -141,6 +156,11 @@ public class MyApplication extends Application {
             mFontCabinRegular = Typeface.createFromAsset(this.getAssets(), "fonts/logo_font.ttf");
         }
         return mFontCabinRegular;
+    }
+
+    public Typeface getMontserrat() {
+
+        return Typeface.createFromAsset(this.getAssets(), "fonts/Montserrat-Regular.otf");
     }
 
     public static class StartService extends BroadcastReceiver {

@@ -3,13 +3,16 @@ package me.arunpadiyan.netaccess;
 /**
  * Created by Arun Padiyan on 21-Jun-16.
  */
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.DisplayMetrics;
 import android.widget.EditText;
 
 import java.io.ByteArrayInputStream;
@@ -147,5 +150,12 @@ public class Utils {
             if (i < (arr.length - 1)) str.append(':');
         }
         return str.toString();
+    }
+
+    public static float convertDpToPixel(float dp, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return px;
     }
 }
