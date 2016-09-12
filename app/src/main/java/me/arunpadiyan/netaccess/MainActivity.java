@@ -518,10 +518,7 @@ public class MainActivity extends AppCompatActivity implements
                mApp.stopAuthService();
                 Log.d("connected", "no_notif");
             }
-            Log.d("connected", "fucker");
-
         } else {
-            Log.d("disconnected", "fucker");
             String ns = Context.NOTIFICATION_SERVICE;
             NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
             nMgr.cancel(1);
