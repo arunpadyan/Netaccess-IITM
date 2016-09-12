@@ -1,6 +1,5 @@
 package me.arunpadiyan.netaccess;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -52,6 +51,7 @@ public class AboutActivity extends AppCompatActivity {
         requestNewInterstitial();
 
         LinearLayout dev = (LinearLayout) findViewById(R.id.developer);
+
         dev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
