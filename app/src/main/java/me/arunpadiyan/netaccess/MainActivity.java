@@ -119,12 +119,12 @@ public class MainActivity extends AppCompatActivity implements
         mApp = (MyApplication) getApplicationContext();
         super.onCreate(savedInstanceState);
 
-        if(!Utils.getprefBool("first_time_login1",this)){
-            Utils.saveprefBool(MyApplication.SERVICE_ENABLED,true,this);
+        if(!Utils.getprefBool("first_time_login22",this)){
+            Utils.saveprefBool(MyApplication.SERVICE_ENABLED,false,this);
             Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
             Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,this);
             //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
-            Utils.saveprefBool("first_time_login1",true,this);
+            Utils.saveprefBool("first_time_login22",true,this);
             // showCustomDialog();
 
         }
@@ -138,9 +138,7 @@ public class MainActivity extends AppCompatActivity implements
 
         }
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-        myRef.setValue("Hello, World!");
+
         context = this;
         setContentView(R.layout.activity_main);
 
@@ -262,9 +260,16 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
+                    createNotification(MainActivity.this);
                     Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, false,mApp);
                 } else {
+
+                    String ns = Context.NOTIFICATION_SERVICE;
+                    NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
+                    nMgr.cancel(1);
                     Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, true,mApp);
+                    mApp.stopAuthService();
+                    mApp.startAuthService();
                 }
                 NotificationChecker();
             }
@@ -430,10 +435,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    public static void hideSoftKeyboard(ActionBarActivity activity, View view) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
-    }
 
     public static Notification createNotification(Context cont) {
         String ns = Context.NOTIFICATION_SERVICE;
@@ -508,14 +509,19 @@ public class MainActivity extends AppCompatActivity implements
     public void NotificationChecker() {
         if (Utils.isNetworkAvailable(mApp)) {
             if (!Utils.getprefBool("notifcation_login",mApp) && Utils.getprefBool(mApp.VALID_PASS,context)) {
+                MainActivity.createNotification(context);
 
-                mApp.startAuthService();
+                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                    // ((MyApplication) context.getApplicationContext()).stopAuthService();
+                    mApp.startAuthService();
+                }
                 Log.d("connected", "notif");
             } else {
                 String ns = Context.NOTIFICATION_SERVICE;
                 NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
+                nMgr.cancel(1);
                 if(isNotificationVisible())
-               mApp.stopAuthService();
+                mApp.stopAuthService();
                 Log.d("connected", "no_notif");
             }
         } else {

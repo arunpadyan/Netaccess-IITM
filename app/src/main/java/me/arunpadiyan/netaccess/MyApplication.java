@@ -108,7 +108,7 @@ public class MyApplication extends Application {
                     thredActive = true;
                 }*/
                 if (mWifi.isConnected()) {
-                   // if (!Utils.getprefBool("notifcation_login",context)) MainActivity.createNotification(context);
+                    if (!Utils.getprefBool("notifcation_login",context)) MainActivity.createNotification(context);
                     Log.d(TAG, "connected");
                     if(Utils.getprefBool(VALID_PASS,context) && Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)){
                         ((MyApplication) context.getApplicationContext()).startAuthService();
