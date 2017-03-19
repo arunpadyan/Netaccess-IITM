@@ -15,11 +15,19 @@
       },
       "oauth_client": [
         {
+          "client_id": "138715041450-5fna6h283n6qnus51redi7gaf96cu93f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.arunpadiyan.netaccess",
+            "certificate_hash": "c83818f3e77316f244150aa8ae7af53a2a9db9aa"
+          }
+        },
+        {
           "client_id": "138715041450-a1gehgtsqungdp0brarcha9uio75k0vk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "me.arunpadiyan.netaccess",
-            "certificate_hash": "AEFF3196C146ECE0AB087874BE1659907E21E90E"
+            "certificate_hash": "aeff3196c146ece0ab087874be1659907e21e90e"
           }
         },
         {
@@ -27,20 +35,20 @@
           "client_type": 1,
           "android_info": {
             "package_name": "me.arunpadiyan.netaccess",
-            "certificate_hash": "69921389CBEEB10950E1CB9F9341953209B7BB1D"
+            "certificate_hash": "69921389cbeeb10950e1cb9f9341953209b7bb1d"
           }
+        },
+        {
+          "client_id": "138715041450-58rqrno4mti2c8rsut4ak16v119putl4.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "138715041450-jgea0ik9ddkr9a4pp74bm8d6ftht30b1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "me.arunpadiyan.netaccess",
-            "certificate_hash": "DF1008862B9B01B441CDCD6104B4E6DB34D065CF"
+            "certificate_hash": "df1008862b9b01b441cdcd6104b4e6db34d065cf"
           }
-        },
-        {
-          "client_id": "138715041450-58rqrno4mti2c8rsut4ak16v119putl4.apps.googleusercontent.com",
-          "client_type": 3
         }
       ],
       "api_key": [
@@ -50,10 +58,7 @@
       ],
       "services": {
         "analytics_service": {
-          "status": 2,
-          "analytics_property": {
-            "tracking_id": "UA-61389535-1"
-          }
+          "status": 1
         },
         "appinvite_service": {
           "status": 2,

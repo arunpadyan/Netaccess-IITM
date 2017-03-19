@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+
+    <entry>
+        <key>admob_app_id</key>
+        <value>ca-app-pub-1464837151836444~7276168613</value>
+    </entry>
+
+    <entry>
+        <key>banner_1</key>
+        <value>ca-app-pub-1464837151836444/8752901819</value>
+    </entry>
+    <entry>
+        <key>interstetial_1</key>
+        <value>ca-app-pub-1464837151836444/5762409411</value>
+    </entry>
+    <entry>
+        <key>interstetial_2</key>
+        <value>ca-app-pub-1464837151836444/8715875816</value>
+    </entry>
+
+
+    <entry>
+        <key>banner_1_p</key>
+        <value>0</value>
+    </entry>
+
+    <entry>
+        <key>test_device</key>
+        <value>262BD5E4C9589ED602D857215D0C4BDD</value>
+    </entry>
+
+    <entry>
+        <key>interstetial_1_p</key>
+        <value>0</value>
+    </entry>
+    <entry>
+        <key>interstetial_2_p</key>
+        <value>0</value>
+    </entry>
+
+
+    <entry>
+        <key>firewall_enabled</key>
+        <value>true</value>
+    </entry>
+
+    <entry>
+        <key>netaccess_enabled</key>
+        <value>true</value>
+    </entry>
+
+    <entry>
+        <key>force_update_version</key>
+        <value>0</value>
+    </entry>
+
+    <entry>
+        <key>test</key>
+        <value>0</value>
+    </entry>
+
+</defaultsMap>

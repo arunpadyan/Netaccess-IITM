@@ -17,8 +17,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,12 +30,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -45,6 +46,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -55,9 +57,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -75,6 +79,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import me.arunpadiyan.netaccess.Objects.CircleView;
 import me.arunpadiyan.netaccess.Objects.EventBusLoading;
@@ -92,24 +97,38 @@ public class MainActivity extends AppCompatActivity implements
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_INVITE = 0;
     static CookieManager cm = new CookieManager();
-    // SwipeRefreshLayout mSwipeRefreshLayout;
-  //  static Tracker t;
+
     ProgressDialog pDialog;
     TextView test;
     EditText rollno, ldap;
-    Context context;
-    String regid;
-    boolean requstGoing = true;
+    CircleView Circle;
+    CircleView CircleBack;
+    Toolbar toolbar;
     RecyclerView UsageRecyclerView;
     SwipeRefreshLayout mSwipeRefreshLayout;
+
+    Button approve;
+    Button logout;
+    CheckBox Notifi ;
+    CheckBox cbService ;
+    CheckBox cbNetAccess;
+
+    Context context;
+    boolean requstGoing = true;
+    boolean mNetaccess;
+    boolean mFirewall;
+
     MyApplication mApp;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAnalytics mFirebaseAnalytics;
-    private InterstitialAd mInterstitialAd;
-    CircleView Circle;
-    CircleView CircleBack;
+    FirebaseRemoteConfig mFirebaseRemoteConfig;
+
+
     int CurrentNetworkMode = 0;
+
     private InterstitialAd mInterstitialAd2;
+    private InterstitialAd mInterstitialAd;
+
 
     /**
      * @return Application's version code from the {@code PackageManager}.
@@ -118,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         mApp = (MyApplication) getApplicationContext();
         super.onCreate(savedInstanceState);
-
         if(!Utils.getprefBool("first_time_login22",this)){
             Utils.saveprefBool(MyApplication.SERVICE_ENABLED,false,this);
             Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
@@ -137,55 +155,50 @@ public class MainActivity extends AppCompatActivity implements
             // showCustomDialog();
 
         }
-
-
         context = this;
         setContentView(R.layout.activity_main);
+        initComponents();
 
+    }
 
-        Circle =(CircleView) findViewById(R.id.border);
-        CircleBack =(CircleView) findViewById(R.id.border2);
-
-        setNetworkMode(MODE_FAILED);
-
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        MobileAds.initialize(getApplicationContext(), "ca-app-pub-5514295486090543~8789911718");
-
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest request = new AdRequest.Builder()
-                .addTestDevice("98E9534D9298ECC93E2F46F2D815F745")
-                .build();
-        mAdView.loadAd(request);
-
-
-
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        CookieHandler.setDefault(cm);
-
-        UsageRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        UsageRecyclerView.setHasFixedSize(true);
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        UsageRecyclerView.setLayoutManager(layoutManager);
-
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setTitle("");
-        }
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark);
-
-        test = (TextView) findViewById(R.id.test);
-        rollno = (EditText) findViewById(R.id.edit_text_rollno);
-        ldap = (EditText) findViewById(R.id.edit_text__pass);
-        Button approve = (Button) findViewById(R.id.button_login);
-        Button logout = (Button) findViewById(R.id.button_logout);
-
-        rollno.setText(Utils.getprefString(mApp.USER_NAME, this));
-        ldap.setText(Utils.getprefString(mApp.LDAP_PASSWORD, this));
+    private void initComponents(){
+        initFirebase();
+        initViws();
+        initButtons();
+        initAnimation();
+        initAd();
+        initAppinvite();
+        showUpdateDialog();
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        CookieHandler.setDefault(cm);
+
+        // checking remote config loading
+        Log.d(TAG,"test : "+mFirebaseRemoteConfig.getString("test"));
+
+    }
+
+    private void initAppinvite() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(AppInvite.API)
+                .enableAutoManage(this, this)
+                .build();
+
+
+        boolean autoLaunchDeepLink = true;
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
+                .setResultCallback(
+                        new ResultCallback<AppInviteInvitationResult>() {
+                            @Override
+                            public void onResult(AppInviteInvitationResult result) {
+                                Log.d(TAG, "getInvitation:onResult:" + result.getStatus());
+                            }
+                        });
+        Log.d("MainActivity",Utils.getCertificateSHA1Fingerprint(this));
+
+    }
+
+    private void initButtons() {
 
         approve.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,14 +243,11 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        CheckBox Notifi = (CheckBox) findViewById(R.id.trackData);
-        CheckBox cbService = (CheckBox) findViewById(R.id.service);
-        CheckBox cbNetAccess = (CheckBox) findViewById(R.id.netacces);
 
-        Notifi.setChecked(!Utils.getprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED,mApp));
-        cbService.setChecked(Utils.getprefBool(MyApplication.SERVICE_ENABLED,mApp));
-        cbNetAccess.setChecked(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,mApp));
 
+    }
+
+    private void initCheckBox() {
         cbService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -289,33 +299,37 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+    }
 
-        //app invite
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(AppInvite.API)
-                .enableAutoManage(this, this)
+    private void initAd() {
+        MobileAds.initialize(getApplicationContext(), mFirebaseRemoteConfig
+                .getString(getString(R.string.admob_app_id)));
+
+
+        RelativeLayout adContainer =(RelativeLayout) findViewById(R.id.ad_view);
+        AdView mAdView = new AdView(context);
+        mAdView.setAdUnitId(mFirebaseRemoteConfig.getString(getString(R.string.banner_1)));
+        mAdView.setAdSize(AdSize.SMART_BANNER);
+        adContainer.addView(mAdView);
+
+        AdRequest request = new AdRequest.Builder()
+                .addTestDevice(mFirebaseRemoteConfig.getString("test_device"))
                 .build();
 
-        // Check for App Invite invitations and launch deep-link activity if possible.
-        // Requires that an Activity is registered in AndroidManifest.xml to handle
-        // deep-link URLs.
-        boolean autoLaunchDeepLink = true;
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
-                .setResultCallback(
-                        new ResultCallback<AppInviteInvitationResult>() {
-                            @Override
-                            public void onResult(AppInviteInvitationResult result) {
-                                Log.d(TAG, "getInvitation:onResult:" + result.getStatus());
-                                // Because autoLaunchDeepLink = true we don't have to do anything
-                                // here, but we could set that to false and manually choose
-                                // an Activity to launch to handle the deep link here.
-                            }
-                        });
-        Log.d("MainActivity",Utils.getCertificateSHA1Fingerprint(this));
+       if(show((int)mFirebaseRemoteConfig.getLong(getString(R.string.banner_1)+"_p"))){
+           mAdView.loadAd(request);
+       }
 
+        /*
+        MobileAds.initialize(this, "ca-app-pub-1464837151836444~7276168613");
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(getString(R.string.my_device_id))
+                .build();
+        mAdView.loadAd(adRequest);*/
 
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-5514295486090543/7748609313");
+        mInterstitialAd.setAdUnitId(mFirebaseRemoteConfig.getString(getString(R.string.interstetial_1)));
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
@@ -327,15 +341,74 @@ public class MainActivity extends AppCompatActivity implements
 
 
         mInterstitialAd2 = new InterstitialAd(this);
-        mInterstitialAd2.setAdUnitId("ca-app-pub-5514295486090543/7559819315");
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(getString(R.string.my_device_id))
+        mInterstitialAd2.setAdUnitId(mFirebaseRemoteConfig.getString(getString(R.string.interstetial_2)));
+        AdRequest adRequest2 = new AdRequest.Builder()
+                .addTestDevice(mFirebaseRemoteConfig.getString("test_device"))
                 .build();
+        mInterstitialAd2.loadAd(adRequest2);
+    }
 
-        mInterstitialAd2.loadAd(adRequest);
+    private void initAnimation() {
+        setNetworkMode(MODE_FAILED);
+    }
 
+    private void initFirebase() {
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+        fetchWelcome();
+
+        mNetaccess = mFirebaseRemoteConfig.getBoolean(getString(R.string.netaccess_enabled));
+        mFirewall = mFirebaseRemoteConfig.getBoolean(getString(R.string.firewall_enabled));
+        // fetchRemoteConfig();
 
     }
+
+    private void initViws() {
+        Circle =(CircleView) findViewById(R.id.border);
+        CircleBack =(CircleView) findViewById(R.id.border2);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        UsageRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
+        test = (TextView) findViewById(R.id.test);
+        rollno = (EditText) findViewById(R.id.edit_text_rollno);
+        ldap = (EditText) findViewById(R.id.edit_text__pass);
+        approve = (Button) findViewById(R.id.button_login);
+        logout = (Button) findViewById(R.id.button_logout);
+        Notifi = (CheckBox) findViewById(R.id.trackData);
+        cbService = (CheckBox) findViewById(R.id.service);
+        cbNetAccess = (CheckBox) findViewById(R.id.netacces);
+
+
+        Notifi.setChecked(!Utils.getprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED,mApp));
+        cbService.setChecked(Utils.getprefBool(MyApplication.SERVICE_ENABLED,mApp));
+        cbNetAccess.setChecked(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,mApp));
+
+        initCheckBox();
+
+        rollno.setText(Utils.getprefString(mApp.USER_NAME, this));
+        ldap.setText(Utils.getprefString(mApp.LDAP_PASSWORD, this));
+
+
+        UsageRecyclerView.setHasFixedSize(true);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        UsageRecyclerView.setLayoutManager(layoutManager);
+
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setTitle("");
+        }
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark);
+
+    }
+
+
+
 
     private void setNetworkMode(int mode){
         if(CurrentNetworkMode != mode ){
@@ -379,7 +452,10 @@ public class MainActivity extends AppCompatActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventBusSuccess event) {
         if(event != null){
-            mInterstitialAd2.show();
+            if(show((int)mFirebaseRemoteConfig.getLong(getString(R.string.interstetial_2)+"_p"))){
+                mInterstitialAd2.show();
+            }
+
             if(event.isSuccess){
                 setNetworkMode(MODE_SUCCESS);
                // ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_green));
@@ -407,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(getString(R.string.my_device_id))
+                .addTestDevice(mFirebaseRemoteConfig.getString("test_device"))
                 .build();
 
         mInterstitialAd.loadAd(adRequest);
@@ -416,11 +492,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         // super.onBackPressed();
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
-            finish();
-        }
+
+            if (mInterstitialAd.isLoaded()
+                    && show((int)mFirebaseRemoteConfig.getLong(getString(R.string.interstetial_1)+"_p"))) {
+                mInterstitialAd.show();
+            } else {
+                finish();
+            }
+
     }
 
     private static int getAppVersion(Context context) {
@@ -614,15 +693,8 @@ public class MainActivity extends AppCompatActivity implements
 
         if (requestCode == REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
-                // Check how many invitations were sent and log a message
-                // The ids array contains the unique invitation ids for each invitation sent
-                // (one for each contact select by the user). You can use these for analytics
-                // as the ID will be consistent on the sending and receiving devices.
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
-                //Log.d(TAG, getString(R.string.sent_invitations_fmt, ids.length));
             } else {
-                // Sending failed or it was canceled, show failure message to the user
-                // showMessage(getString(R.string.send_failed));
             }
         }
     }
@@ -651,7 +723,6 @@ public class MainActivity extends AppCompatActivity implements
     public static class switchButtonListener extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("TAG", "test");
             if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
                 new LoginNotif().execute();
             }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
@@ -733,6 +804,7 @@ public class MainActivity extends AppCompatActivity implements
                     ((MyApplication) MyApplication.getContext()).startAuthService();
 
                 }
+                EventBus.getDefault().post(new EventBusSuccess(true));
                 FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(MyApplication.getContext());
 
                 if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
@@ -844,39 +916,40 @@ public class MainActivity extends AppCompatActivity implements
                     }
 
                 } else {
-                    test.setText(loginform.text());
+                   /* test.setText(loginform.text());
                     saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
                     saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
                     Utils.saveprefBool(mApp.VALID_PASS, true,context);
                     if (!Utils.getprefBool("notifcation_login",context)) createNotification(MainActivity.this);
                    // context.stopvice(new Intent(context, AuthService.class));
+                */
 
-                }
-                if (300 < loginform.text().length()) {
-                    test.setTextColor(Color.RED);
-                    test.setText("wrong password ");
-                } else {
-                    test.setText(loginform.text());
-                    saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
-                    saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
-                    Utils.saveprefBool(mApp.VALID_PASS, true,context);
+                    if (300 < loginform.text().length()) {
+                        test.setTextColor(Color.RED);
+                        test.setText("wrong password ");
+                    } else {
+                        onMessageEvent(new EventBusSuccess(true));
+                        if (!Utils.getprefBool("notifcation_login",context)) createNotification(MainActivity.this);
 
-                    if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,context)){
-                        Bundle params = new Bundle();
-                        params.putString("result", "success");
-                        mFirebaseAnalytics.logEvent("MainActivity_Login", params);
+                        test.setText(loginform.text());
+                        saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
+                        saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
+                        Utils.saveprefBool(mApp.VALID_PASS, true,context);
+
+                        if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,context)){
+                            Bundle params = new Bundle();
+                            params.putString("result", "success");
+                            mFirebaseAnalytics.logEvent("MainActivity_Login", params);
+                        }
+
+                        if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                            ((MyApplication) getApplicationContext()).stopAuthService();
+                            ((MyApplication) getApplicationContext()).startAuthService();
+                        }
                     }
 
-                    /*t.send(new HitBuilders.EventBuilder()
-                            .setCategory("Login")
-                            .setAction("Success")
-                            .build());*/
-
-                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                        ((MyApplication) getApplicationContext()).stopAuthService();
-                        ((MyApplication) getApplicationContext()).startAuthService();
-                    }
                 }
+
                 // Elements par = loginform.select("[p]");
 
                 // String name = doc.attr(".alert-success");
@@ -997,5 +1070,79 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    protected void showUpdateDialog() {
+
+
+        int versionCode = BuildConfig.VERSION_CODE;
+        if(mFirebaseRemoteConfig.getLong(getString(R.string.force_update_version)) > versionCode){
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View dialog = inflater.inflate(R.layout.update_dialoge, null);
+            TextView  tvSend;
+
+            //final EditText editText = (EditText)dialog.findViewById(R.id.editText1);
+            // cancel = (Button)dialog.findViewById(R.id.cancel);
+
+            tvSend = (TextView) dialog.findViewById(R.id.tv_send);
+
+
+
+            alertDialogBuilder.setView(dialog);
+            alertDialogBuilder.setCancelable(true);
+            final AlertDialog Dialog = alertDialogBuilder.create();
+
+            Dialog.getWindow().getDecorView().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Dialog.setCancelable(false);
+            Dialog.show();
+
+            tvSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("market://details?id="+getApplicationContext().getPackageName()));
+                    startActivity(intent);
+
+                }
+            });
+
+        }
+
+
+
+    }
+    private void fetchWelcome() {
+
+        long cacheExpiration = 3600; // 1 hour in seconds.
+        if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+            cacheExpiration = 0;
+        }
+        mFirebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                           /* Toast.makeText(MainActivity.this, "Fetch Succeeded",
+                                    Toast.LENGTH_SHORT).show();
+*//**/
+                            // After config data is successfully fetched, it must be activated before newly fetched
+                            // values are returned.
+                            mFirebaseRemoteConfig.activateFetched();
+                        } else {
+                           /* Toast.makeText(MainActivity.this, "Fetch Failed",
+                                    Toast.LENGTH_SHORT).show();*/
+                        }
+                        Log.d(TAG,"test : "+mFirebaseRemoteConfig.getString("test"));
+
+                    }
+                });
+        // [END fetch_config_with_callback]
+    }
+
+    boolean show(int value){
+        Random ran = new Random();
+        int x = ran.nextInt(100) + 1;
+        if(x<value) return true;
+        return false;
+    }
 
 }

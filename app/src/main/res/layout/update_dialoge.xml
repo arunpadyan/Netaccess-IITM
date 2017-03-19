@@ -9,22 +9,24 @@
 
 
     <me.arunpadiyan.netaccess.NATextView
-        android:text="For pre lollipop android devices Firewall login may not work properly. We will fix this bug in future updates"
+        android:text="Update Firewall IITM app.This version is no longer supported"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textColor="@color/colorPrimary"
-        app:fontName="fjord"
-        android:textSize="13sp"
+        app:fontName="normal"
+        android:textSize="16sp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp" />
+       />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/border_grey"
+        android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp" />
+        android:background="@color/border_grey"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,21 +39,8 @@
 
             android:layout_marginBottom="10dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="15dp">
+            android:layout_marginTop="16dp">
 
-            <me.arunpadiyan.netaccess.NATextView
-                android:id="@+id/tv_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                android:paddingLeft="35dp"
-                android:paddingRight="35dp"
-                android:paddingTop="5dp"
-                android:text="Optout"
-                android:textColor="@color/colorPrimary"
-                android:textSize="15sp"
-                app:fontName="fjord"
-                android:visibility="gone" />
 
             <me.arunpadiyan.netaccess.NATextView
                 android:id="@+id/tv_send"
@@ -62,7 +51,7 @@
                 android:paddingLeft="35dp"
                 android:paddingRight="35dp"
                 android:paddingTop="7dp"
-                android:text="z"
+                android:text="Update"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 app:fontName="fjord" />

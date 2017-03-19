@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,11 +17,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 public class MyApplication extends Application {
     public static final String FORCE_LOGIN = "force_login";
-    private static Application instance;
+    private static MyApplication instance;
     public static final String TAG = "MyApplication";
     public static final String USER_NAME = "user_name";
     public static final String LDAP_PASSWORD = "ldap_password";
@@ -41,6 +45,8 @@ public class MyApplication extends Application {
     Toast mToast ;
     TextView mToastText;
 
+    FirebaseRemoteConfig mFirebaseRemoteConfig;
+
     Context mContext ;
 
     @Override
@@ -55,12 +61,26 @@ public class MyApplication extends Application {
       //  HttpURLConnection.setFollowRedirects(true);
 
         mContext = this;
+        initFirebase();
 
 
     }
 
+    private void initFirebase() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        /*FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+        fetchRemoteConfig();*/
+
+    }
+
     public void startAuthService(){
-        startService(new Intent(this, AuthService.class));
+       if(mFirebaseRemoteConfig.getBoolean(getString(R.string.firewall_enabled))){
+           startService(new Intent(this, AuthService.class));
+       }else stopAuthService();
 
     }
 
@@ -87,8 +107,8 @@ public class MyApplication extends Application {
         mToastText.setText(text);
         mToast.show();
     }
-    public static android.content.Context getContext() {
-        return instance.getApplicationContext();
+    public static MyApplication getContext() {
+        return instance;
     }
 
 
@@ -171,6 +191,20 @@ public class MyApplication extends Application {
             ((MyApplication) context.getApplicationContext()).startAuthService();
             }
 
+    }
+
+    private void fetchRemoteConfig() {
+        long cacheExpiration = 3600; // 1 hour in seconds.
+        if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+            cacheExpiration = 0;
+        }
+        mFirebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
     }
 
 }
