@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 25
@@ -10,7 +9,7 @@ android {
         applicationId "me.arunpadiyan.netaccess"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 35
+        versionCode 38       
         versionName "2.3"
     }
     buildTypes {
@@ -23,26 +22,24 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    def final playSupportVersion = '25.2.0'
+    def final playSupportVersion = '25.3.0'
     compile "com.android.support:appcompat-v7:${playSupportVersion}"
     compile "com.android.support:design:${playSupportVersion}"
     compile "com.android.support:support-v4:${playSupportVersion}"
     compile "com.android.support:recyclerview-v7:${playSupportVersion}"
     compile "com.android.support:cardview-v7:${playSupportVersion}"
-
-
-    def final playServicesVersion = '10.2.0'
+    def final playServicesVersion = '10.0.1'
     compile "com.google.firebase:firebase-core:${playServicesVersion}"
-    compile "com.google.firebase:firebase-ads:${playServicesVersion}"
+    compile "com.google.android.gms:play-services-ads:${playServicesVersion}"
     compile "com.google.firebase:firebase-invites:${playServicesVersion}"
     compile "com.google.firebase:firebase-crash:${playServicesVersion}"
     compile "com.google.firebase:firebase-messaging:${playServicesVersion}"
     compile "com.google.firebase:firebase-config:${playServicesVersion}"
-
-
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.android.volley:volley:1.0.0'
-
+    compile 'com.google.firebase:firebase-ads:10.0.1'
+    compile files('lib/chartboost.jar')
 }
+apply plugin: 'com.google.gms.google-services'

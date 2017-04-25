@@ -117,7 +117,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-5514295486090543/6850945718");
+        mInterstitialAd.setAdUnitId("ca-app-pub-55142954uiolui86090543/6850945718");
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {

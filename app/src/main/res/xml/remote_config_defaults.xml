@@ -27,7 +27,7 @@
 
     <entry>
         <key>test_device</key>
-        <value>262BD5E4C9589ED602D857215D0C4BDD</value>
+        <value>6A3C03ADB6514F9C747799EC003C9549</value>
     </entry>
 
     <entry>
@@ -58,6 +58,10 @@
     <entry>
         <key>test</key>
         <value>0</value>
+    </entry>
+    <entry>
+        <key>duration</key>
+        <value>1</value>
     </entry>
 
 </defaultsMap>

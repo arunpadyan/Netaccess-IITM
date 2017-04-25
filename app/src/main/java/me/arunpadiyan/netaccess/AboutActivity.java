@@ -40,7 +40,7 @@ public class AboutActivity extends AppCompatActivity {
 
 
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-5514295486090543/9225342517");
+        mInterstitialAd.setAdUnitId("ca-app-pub-5514kyt295486090543/9225342517");
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {

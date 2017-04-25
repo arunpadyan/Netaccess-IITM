@@ -44,6 +44,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.chartboost.sdk.CBLocation;
+import com.chartboost.sdk.Chartboost;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -302,8 +304,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initAd() {
-        MobileAds.initialize(getApplicationContext(), mFirebaseRemoteConfig
-                .getString(getString(R.string.admob_app_id)));
+        MobileAds.initialize(getApplicationContext(), mFirebaseRemoteConfig.getString(getString(R.string.admob_app_id)));
 
 
         RelativeLayout adContainer =(RelativeLayout) findViewById(R.id.ad_view);
@@ -346,6 +347,13 @@ public class MainActivity extends AppCompatActivity implements
                 .addTestDevice(mFirebaseRemoteConfig.getString("test_device"))
                 .build();
         mInterstitialAd2.loadAd(adRequest2);
+
+
+        Chartboost.startWithAppId(this, "58fa0915f6cd454998516a91", "a98c43595d0cd734bca00b85152b408dee28f846");
+        Chartboost.onCreate(this);
+
+
+
     }
 
     private void initAnimation() {
@@ -432,11 +440,14 @@ public class MainActivity extends AppCompatActivity implements
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+        Chartboost.onStart(this);
+
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        Chartboost.onStop(this);
         super.onStop();
     }
 
@@ -449,12 +460,36 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+
+
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Chartboost.onPause(this);
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Chartboost.onDestroy(this);
+    }
+
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventBusSuccess event) {
         if(event != null){
             if(show((int)mFirebaseRemoteConfig.getLong(getString(R.string.interstetial_2)+"_p"))){
-                mInterstitialAd2.show();
+               // mInterstitialAd2.show();
+                Chartboost.cacheInterstitial(CBLocation.LOCATION_DEFAULT);
+                Chartboost.showInterstitial(CBLocation.LOCATION_DEFAULT);
+                Log.d("ads","here");
+
             }
+           // Chartboost.showInterstitial(CBLocation.LOCATION_DEFAULT);
 
             if(event.isSuccess){
                 setNetworkMode(MODE_SUCCESS);
@@ -487,6 +522,7 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
 
         mInterstitialAd.loadAd(adRequest);
+        Log.d("ads","interstetial");
     }
 
     @Override
@@ -499,6 +535,11 @@ public class MainActivity extends AppCompatActivity implements
             } else {
                 finish();
             }
+
+        if (Chartboost.onBackPressed())
+            return;
+        else
+            super.onBackPressed();
 
     }
 
@@ -624,6 +665,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         checkPlayServices();
+        Chartboost.onResume(this);
+
     }
 
     /**
@@ -738,7 +781,7 @@ public class MainActivity extends AppCompatActivity implements
     private static class LoginNotif extends AsyncTask<String, String, String> {
         String responseBody;
         private String resp;
-
+        FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         @Override
         protected String doInBackground(String... paramso) {
            /* CookieManager cookieManager = new CookieManager();
@@ -753,7 +796,7 @@ public class MainActivity extends AppCompatActivity implements
                 requestURL2 = "https://netaccess.iitm.ac.in/account/approve";
                 params.put("userPassword", Utils.getprefString(MyApplication.LDAP_PASSWORD, MyApplication.getContext()));
                 params.put("userLogin", Utils.getprefString(MyApplication.USER_NAME, MyApplication.getContext()));
-                params.put("duration", "1");
+                params.put("duration", firebaseRemoteConfig.getString("duration"));
                 params.put("approveBtn", "");
 
                 try {
@@ -852,7 +895,7 @@ public class MainActivity extends AppCompatActivity implements
                 requestURL2 = "https://netaccess.iitm.ac.in/account/approve";
                 params.put("userPassword", ldap.getText().toString());
                 params.put("userLogin", rollno.getText().toString());
-                params.put("duration", "1");
+                params.put("duration", mFirebaseRemoteConfig.getString("duration"));
                 params.put("approveBtn", "");
 
                 try {

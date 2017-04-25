@@ -57,7 +57,7 @@ public class MyApplication extends Application {
             //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         }
         instance = this;
-        new NukeSSLCerts().nuke();
+       // new NukeSSLCerts().nuke();
       //  HttpURLConnection.setFollowRedirects(true);
 
         mContext = this;

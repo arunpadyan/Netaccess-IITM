@@ -23,14 +23,6 @@
           }
         },
         {
-          "client_id": "138715041450-a1gehgtsqungdp0brarcha9uio75k0vk.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "me.arunpadiyan.netaccess",
-            "certificate_hash": "aeff3196c146ece0ab087874be1659907e21e90e"
-          }
-        },
-        {
           "client_id": "138715041450-mgguemurepdi892v6u0b845rdjs978dv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
