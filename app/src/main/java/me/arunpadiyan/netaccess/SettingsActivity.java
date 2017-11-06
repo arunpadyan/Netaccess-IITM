@@ -15,9 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+
+import com.facebook.ads.InterstitialAd;
 
 import static me.arunpadiyan.netaccess.MainActivity.createNotification;
 
@@ -115,80 +114,51 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-55142954uiolui86090543/6850945718");
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                //requestNewInterstitial();
-                finish();
-            }
-        });
-        requestNewInterstitial();
+//
+//        mInterstitialAd = new InterstitialAd(this);
+//        mInterstitialAd.setAdUnitId("ca-app-pub-55142954uiolui86090543/6850945718");
+//        mInterstitialAd.setAdListener(new AdListener() {
+//            @Override
+//            public void onAdClosed() {
+//                //requestNewInterstitial();
+//                finish();
+//            }
+//        });
+   //     requestNewInterstitial();
 
 
     }
 
-    private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(getString(R.string.my_device_id))
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
-    }
+//    private void requestNewInterstitial() {
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice(getString(R.string.my_device_id))
+//                .build();
+//
+//        mInterstitialAd.loadAd(adRequest);
+//    }
 
     @Override
     public void onBackPressed() {
-        // super.onBackPressed();
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
-            finish();
-        }
+         super.onBackPressed();
+//        if (mInterstitialAd.isLoaded()) {
+//            mInterstitialAd.show();
+//        } else {
+//            finish();
+//        }
     }
 
     public static void saveBool(String key, Boolean value){
-        SharedPreferences pref = MyApplication.getContext().getSharedPreferences("MyPref", 1); // 0 - for private mode
+        SharedPreferences pref = MyApplication.getContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(key, value);
         editor.commit();
 
     }
     public Boolean getBool(String key){
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 1); // 0 - for private mode
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
         SharedPreferences.Editor editor = pref.edit();
         return pref.getBoolean(key, false);
 
     }
-    public void NotificationChecker(){
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        // if no network is available networkInfo will be null
-        // otherwise check if we are connected
-        if (networkInfo != null && networkInfo.isConnected()) {
-            if (!getBool("notifcation_login")&&getBool("have_name")){
-                createNotification(MyApplication.getContext());
-                Log.d("1","here");
-            }
-            else {
-                String ns = Context.NOTIFICATION_SERVICE;
 
-                NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
-                nMgr.cancel(1);
-            }
-            Log.d("connected", "fucker");
-            // Do your workateNotification();
-        }
-        else {
-            Log.d("disconnected","fucker");
-            String ns = Context.NOTIFICATION_SERVICE;
-
-            NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
-            nMgr.cancel(1);
-        }
-
-
-
-    }
 }

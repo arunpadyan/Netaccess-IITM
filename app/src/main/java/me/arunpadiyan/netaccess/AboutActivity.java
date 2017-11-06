@@ -16,14 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+
 
 public class AboutActivity extends AppCompatActivity {
-
-    InterstitialAd mInterstitialAd;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +34,15 @@ public class AboutActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("About");
 
 
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-5514kyt295486090543/9225342517");
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                //requestNewInterstitial();
-                finish();
-            }
-        });
+//        mInterstitialAd = new InterstitialAd(this);
+//        mInterstitialAd.setAdUnitId("ca-app-pub-5514kyt295486090543/9225342517");
+//        mInterstitialAd.setAdListener(new AdListener() {
+//            @Override
+//            public void onAdClosed() {
+//                //requestNewInterstitial();
+//                finish();
+//            }
+//        });
         requestNewInterstitial();
 
         LinearLayout dev = (LinearLayout) findViewById(R.id.developer);
@@ -74,21 +69,21 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(getString(R.string.my_device_id))
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice(getString(R.string.my_device_id))
+//                .build();
+//
+//        mInterstitialAd.loadAd(adRequest);
     }
 
     @Override
     public void onBackPressed() {
-       // super.onBackPressed();
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
-            finish();
-        }
+        super.onBackPressed();
+//        if (mInterstitialAd.isLoaded()) {
+//            mInterstitialAd.show();
+//        } else {
+//            finish();
+//        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
