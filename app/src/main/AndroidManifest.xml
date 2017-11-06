@@ -52,14 +52,14 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
-        <activity android:name=".AboutActivity"></activity>
+            android:label="@string/title_activity_settings"/>
+        <activity android:name=".AboutActivity"/>
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
 
         <service
             android:name=".AuthService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true"/>
 
     </application>
 
