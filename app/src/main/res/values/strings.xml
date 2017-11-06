@@ -59,6 +59,7 @@
     <string name="invitation_message">Ever felt tired of having to log into netaccess site every now and then? The NetAccess App helps you login into netacess directly from the notification drawer </string>
     <string name="my_device_id">262BD5E4C9589ED602D857215D0C4BDD</string>
 
+    <string name="facebook_app_id">540064132996725</string>
     <!-- Remote config strings -->
     <string name="admob_app_id">admob_app_id</string>
     <string name="banner_1">banner_1</string>

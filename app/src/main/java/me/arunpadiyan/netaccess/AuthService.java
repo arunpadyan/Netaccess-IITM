@@ -51,6 +51,7 @@ public class AuthService extends Service {
     long startTime = System.currentTimeMillis();
     EventBus eventBus;
     MyApplication mApp;
+
     public AuthService() {
         t = new Timer();
         eventBus = EventBus.getDefault();
@@ -73,12 +74,12 @@ public class AuthService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         // mApp = (MyApplication) getApplicationContext();
         allowDestroy = false;
-        mApp =(MyApplication) getApplication();
+        mApp = (MyApplication) getApplication();
         mContext = this;
         queue = Volley.newRequestQueue(this);
 
-        if (!Utils.getprefBool("notifcation_login",mApp) && Utils.isNetworkAvailable(mApp))
-            startForeground(1,MainActivity.createNotification(mContext));
+        if (!Utils.getprefBool("notifcation_login", mApp) && Utils.isNetworkAvailable(mApp))
+            startForeground(1, MainActivity.createNotification(mContext));
 
         /*Toast.makeText(mContext
                 ,"You already have net access,if you want force " +
@@ -192,9 +193,9 @@ public class AuthService extends Service {
                     }
                     Log.d(TAG, function + " :" + "Data :" + parsed);
                     Log.d(TAG, function + " :" + "ResponseCode :" + Integer.toString(mStatusCode));
-                    if(Utils.getprefBool(MyApplication.FORCE_LOGIN,mContext)){
-                      //  AuthLogOut();
-                    }else {
+                    if (Utils.getprefBool(MyApplication.FORCE_LOGIN, mContext)) {
+                        //  AuthLogOut();
+                    } else {
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {

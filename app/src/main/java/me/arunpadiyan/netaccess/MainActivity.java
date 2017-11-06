@@ -44,14 +44,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.chartboost.sdk.CBLocation;
-import com.chartboost.sdk.Chartboost;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
+
+import com.facebook.ads.*;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.appinvite.AppInviteInvitationResult;
@@ -83,7 +77,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import io.fabric.sdk.android.Fabric;
 import me.arunpadiyan.netaccess.Objects.CircleView;
 import me.arunpadiyan.netaccess.Objects.EventBusLoading;
 import me.arunpadiyan.netaccess.Objects.EventBusSuccess;
@@ -112,14 +105,16 @@ public class MainActivity extends AppCompatActivity implements
 
     Button approve;
     Button logout;
-    CheckBox Notifi ;
-    CheckBox cbService ;
+    CheckBox Notifi;
+    CheckBox cbService;
     CheckBox cbNetAccess;
 
     Context context;
     boolean requstGoing = true;
     boolean mNetaccess;
     boolean mFirewall;
+    private AdView adView;
+
 
     MyApplication mApp;
     private GoogleApiClient mGoogleApiClient;
@@ -129,8 +124,8 @@ public class MainActivity extends AppCompatActivity implements
 
     int CurrentNetworkMode = 0;
 
+    private InterstitialAd mInterstitialAd1;
     private InterstitialAd mInterstitialAd2;
-    private InterstitialAd mInterstitialAd;
 
 
     /**
@@ -140,21 +135,21 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         mApp = (MyApplication) getApplicationContext();
         super.onCreate(savedInstanceState);
-        if(!Utils.getprefBool("first_time_login22",this)){
-            Utils.saveprefBool(MyApplication.SERVICE_ENABLED,false,this);
-            Utils.saveprefBool(MyApplication.NETACCESS_LOGIN,true,this);
-            Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,this);
+        if (!Utils.getprefBool("first_time_login22", this)) {
+            Utils.saveprefBool(MyApplication.SERVICE_ENABLED, false, this);
+            Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, true, this);
+            Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED, true, this);
             //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
-            Utils.saveprefBool("first_time_login22",true,this);
+            Utils.saveprefBool("first_time_login22", true, this);
             // showCustomDialog();
 
         }
-        if(!Utils.getprefBool("first_time_login12",this)){
-            if(Build.VERSION.SDK_INT <21){
+        if (!Utils.getprefBool("first_time_login12", this)) {
+            if (Build.VERSION.SDK_INT < 21) {
                 showCustomDialog();
             }
             //  Utils.saveprefBool(MyApplication.FORCE_LOGIN,true,this);
-            Utils.saveprefBool("first_time_login12",true,this);
+            Utils.saveprefBool("first_time_login12", true, this);
             // showCustomDialog();
 
         }
@@ -164,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void initComponents(){
+    private void initComponents() {
         initFirebase();
         initViws();
         initButtons();
@@ -177,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements
         CookieHandler.setDefault(cm);
 
         // checking remote config loading
-        Log.d(TAG,"test : "+mFirebaseRemoteConfig.getString("test"));
+        Log.d(TAG, "test : " + mFirebaseRemoteConfig.getString("test"));
 
     }
 
@@ -197,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements
                                 Log.d(TAG, "getInvitation:onResult:" + result.getStatus());
                             }
                         });
-        Log.d("MainActivity",Utils.getCertificateSHA1Fingerprint(this));
+        Log.d("MainActivity", Utils.getCertificateSHA1Fingerprint(this));
 
     }
 
@@ -207,14 +202,14 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 NotificationChecker();
-                if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
+                if (Utils.getprefBool(MyApplication.NETACCESS_LOGIN, context)) {
                     if (requstGoing) new Login().execute();
-                }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
-                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                } else if (Utils.getprefBool(MyApplication.VALID_PASS, context)) {
+                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED, context)) {
                         //      ((MyApplication) getApplicationContext()).stopAuthService();
-                        if(Utils.isNetworkAvailable(MainActivity.this)){
+                        if (Utils.isNetworkAvailable(MainActivity.this)) {
                             ((MyApplication) getApplicationContext()).startAuthService();
-                        }else {
+                        } else {
                             mApp.showToast("No internet connection");
 
                         }
@@ -235,17 +230,16 @@ public class MainActivity extends AppCompatActivity implements
             public void onRefresh() {
                 NotificationChecker();
 
-                if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
+                if (Utils.getprefBool(MyApplication.NETACCESS_LOGIN, context)) {
                     if (requstGoing) new Login().execute();
-                }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
-                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                } else if (Utils.getprefBool(MyApplication.VALID_PASS, context)) {
+                    if (Utils.getprefBool(MyApplication.SERVICE_ENABLED, context)) {
                         //    ((MyApplication) getApplicationContext()).stopAuthService();
                         ((MyApplication) getApplicationContext()).startAuthService();
                     }
                 }
             }
         });
-
 
 
     }
@@ -258,9 +252,9 @@ public class MainActivity extends AppCompatActivity implements
                 if (((CheckBox) v).isChecked()) {
                     //   ((MyApplication) getApplicationContext()).stopAuthService();
                     ((MyApplication) getApplicationContext()).startAuthService();
-                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true,mApp);
+                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, true, mApp);
                 } else {
-                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, false,mApp);
+                    Utils.saveprefBool(MyApplication.SERVICE_ENABLED, false, mApp);
                     ((MyApplication) getApplicationContext()).stopAuthService();
                 }
                 NotificationChecker();
@@ -274,13 +268,13 @@ public class MainActivity extends AppCompatActivity implements
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
                     createNotification(MainActivity.this);
-                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, false,mApp);
+                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, false, mApp);
                 } else {
 
                     String ns = Context.NOTIFICATION_SERVICE;
                     NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
                     nMgr.cancel(1);
-                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, true,mApp);
+                    Utils.saveprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, true, mApp);
                     mApp.stopAuthService();
                     mApp.startAuthService();
                 }
@@ -294,9 +288,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View v) {
                 //is chkIos checked?
                 if (((CheckBox) v).isChecked()) {
-                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, true,mApp);
+                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, true, mApp);
                 } else {
-                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, false,mApp);
+                    Utils.saveprefBool(MyApplication.NETACCESS_LOGIN, false, mApp);
                 }
                 //  NotificationChecker();
             }
@@ -305,55 +299,101 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initAd() {
-        MobileAds.initialize(getApplicationContext(), mFirebaseRemoteConfig.getString(getString(R.string.admob_app_id)));
 
-
-        RelativeLayout adContainer =(RelativeLayout) findViewById(R.id.ad_view);
-        AdView mAdView = new AdView(context);
-        mAdView.setAdUnitId(mFirebaseRemoteConfig.getString(getString(R.string.banner_1)));
-        mAdView.setAdSize(AdSize.SMART_BANNER);
-        adContainer.addView(mAdView);
-
-        AdRequest request = new AdRequest.Builder()
-                .addTestDevice(mFirebaseRemoteConfig.getString("test_device"))
-                .build();
-
-       if(show((int)mFirebaseRemoteConfig.getLong(getString(R.string.banner_1)+"_p"))){
-           mAdView.loadAd(request);
-       }
-
-        /*
-        MobileAds.initialize(this, "ca-app-pub-1464837151836444~7276168613");
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(getString(R.string.my_device_id))
-                .build();
-        mAdView.loadAd(adRequest);*/
-
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(mFirebaseRemoteConfig.getString(getString(R.string.interstetial_1)));
-        mInterstitialAd.setAdListener(new AdListener() {
+        RelativeLayout adContainer = (RelativeLayout) findViewById(R.id.ad_view);
+        adView = new AdView(this
+                , mFirebaseRemoteConfig.getString(getString(R.string.banner_1))
+                , AdSize.BANNER_HEIGHT_50);
+        adContainer.addView(adView);
+        adView.setAdListener(new AbstractAdListener() {
             @Override
-            public void onAdClosed() {
-                //requestNewInterstitial();
-                finish();
+            public void onError(Ad ad, AdError adError) {
+                super.onError(ad, adError);
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                Bundle params = new Bundle();
+                mFirebaseAnalytics.logEvent("ad_clicked_banner", params);
+                super.onAdClicked(ad);
             }
         });
-        requestNewInterstitial();
 
+        if (show((int) mFirebaseRemoteConfig.getLong(getString(R.string.banner_1) + "_p"))) {
+            adView.loadAd();
+        }
 
-        mInterstitialAd2 = new InterstitialAd(this);
-        mInterstitialAd2.setAdUnitId(mFirebaseRemoteConfig.getString(getString(R.string.interstetial_2)));
-        AdRequest adRequest2 = new AdRequest.Builder()
-                .addTestDevice(mFirebaseRemoteConfig.getString("test_device"))
-                .build();
-        mInterstitialAd2.loadAd(adRequest2);
+        mInterstitialAd1 = new InterstitialAd(this
+                ,mFirebaseRemoteConfig.getString(getString(R.string.interstetial_1)));
+        mInterstitialAd1.loadAd();
+        mInterstitialAd1.setAdListener(new InterstitialAdListener() {
+            @Override
+            public void onInterstitialDisplayed(Ad ad) {
 
+            }
 
-        Chartboost.startWithAppId(this, "58fa0915f6cd454998516a91", "a98c43595d0cd734bca00b85152b408dee28f846");
-        Chartboost.onCreate(this);
+            @Override
+            public void onInterstitialDismissed(Ad ad) {
 
+            }
 
+            @Override
+            public void onError(Ad ad, AdError adError) {
+
+            }
+
+            @Override
+            public void onAdLoaded(Ad ad) {
+
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                Bundle params = new Bundle();
+                mFirebaseAnalytics.logEvent("ad_clicked_interstitial_1", params);
+            }
+
+            @Override
+            public void onLoggingImpression(Ad ad) {
+
+            }
+        });
+
+        mInterstitialAd2 = new InterstitialAd(this
+                , mFirebaseRemoteConfig.getString(getString(R.string.interstetial_1)));
+        mInterstitialAd2.loadAd();
+        mInterstitialAd2.setAdListener(new InterstitialAdListener() {
+            @Override
+            public void onInterstitialDisplayed(Ad ad) {
+
+            }
+
+            @Override
+            public void onInterstitialDismissed(Ad ad) {
+
+            }
+
+            @Override
+            public void onError(Ad ad, AdError adError) {
+
+            }
+
+            @Override
+            public void onAdLoaded(Ad ad) {
+
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                Bundle params = new Bundle();
+                mFirebaseAnalytics.logEvent("ad_clicked_interstitial_2", params);
+            }
+
+            @Override
+            public void onLoggingImpression(Ad ad) {
+
+            }
+        });
 
     }
 
@@ -379,8 +419,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initViws() {
-        Circle =(CircleView) findViewById(R.id.border);
-        CircleBack =(CircleView) findViewById(R.id.border2);
+        Circle = (CircleView) findViewById(R.id.border);
+        CircleBack = (CircleView) findViewById(R.id.border2);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         UsageRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
@@ -394,9 +434,9 @@ public class MainActivity extends AppCompatActivity implements
         cbNetAccess = (CheckBox) findViewById(R.id.netacces);
 
 
-        Notifi.setChecked(!Utils.getprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED,mApp));
-        cbService.setChecked(Utils.getprefBool(MyApplication.SERVICE_ENABLED,mApp));
-        cbNetAccess.setChecked(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,mApp));
+        Notifi.setChecked(!Utils.getprefBool(MyApplication.NOTIFICATION_LOGIN_ENABLED, mApp));
+        cbService.setChecked(Utils.getprefBool(MyApplication.SERVICE_ENABLED, mApp));
+        cbNetAccess.setChecked(Utils.getprefBool(MyApplication.NETACCESS_LOGIN, mApp));
 
         initCheckBox();
 
@@ -417,20 +457,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
-
-    private void setNetworkMode(int mode){
-        if(CurrentNetworkMode != mode ){
-            if(mode == MODE_FAILED){
+    private void setNetworkMode(int mode) {
+        if (CurrentNetworkMode != mode) {
+            if (mode == MODE_FAILED) {
                 CircleBack.setColor(R.color.logo_green);
                 Circle.setColor(R.color.logo_red);
                 CircleBack.setSweepAngle(360);
-                Circle.animateArc(0,360,2000);
-            }else if(mode == MODE_SUCCESS){
+                Circle.animateArc(0, 360, 2000);
+            } else if (mode == MODE_SUCCESS) {
                 CircleBack.setColor(R.color.logo_red);
                 Circle.setColor(R.color.logo_green);
                 CircleBack.setSweepAngle(360);
-                Circle.animateArc(0,360,2000);
+                Circle.animateArc(0, 360, 2000);
             }
         }
         CurrentNetworkMode = mode;
@@ -441,20 +479,18 @@ public class MainActivity extends AppCompatActivity implements
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        Chartboost.onStart(this);
 
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
-        Chartboost.onStop(this);
         super.onStop();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventBusLoading event) {
-        if(event != null){
+        if (event != null) {
             mSwipeRefreshLayout.setRefreshing(event.isLoading);
 
 
@@ -462,42 +498,33 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
-
-
     @Override
     public void onPause() {
         super.onPause();
-        Chartboost.onPause(this);
     }
-
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Chartboost.onDestroy(this);
     }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventBusSuccess event) {
-        if(event != null){
-            if(show((int)mFirebaseRemoteConfig.getLong(getString(R.string.interstetial_2)+"_p"))){
-               // mInterstitialAd2.show();
-                Chartboost.cacheInterstitial(CBLocation.LOCATION_DEFAULT);
-                Chartboost.showInterstitial(CBLocation.LOCATION_DEFAULT);
-                Log.d("ads","here");
-
+        if (event != null) {
+            if (show((int) mFirebaseRemoteConfig.getLong(getString(R.string.interstetial_1) + "_p"))) {
+                if (mInterstitialAd1.isAdLoaded())
+                    mInterstitialAd1.show();
             }
-           // Chartboost.showInterstitial(CBLocation.LOCATION_DEFAULT);
+            // Chartboost.showInterstitial(CBLocation.LOCATION_DEFAULT);
 
-            if(event.isSuccess){
+            if (event.isSuccess) {
                 setNetworkMode(MODE_SUCCESS);
-               // ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_green));
-            }else {
+                // ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_green));
+            } else {
                 setNetworkMode(MODE_FAILED);
-              //  ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_red));
+                //  ((ImageView) findViewById(R.id.logo)).setImageDrawable(ContextCompat.getDrawable(this,R.drawable.logo_red));
             }
         }
     }
@@ -517,30 +544,16 @@ public class MainActivity extends AppCompatActivity implements
         anim.start();
     }*/
 
-    private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(mFirebaseRemoteConfig.getString("test_device"))
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
-        Log.d("ads","interstetial");
-    }
-
     @Override
     public void onBackPressed() {
         // super.onBackPressed();
 
-            if (mInterstitialAd.isLoaded()
-                    && show((int)mFirebaseRemoteConfig.getLong(getString(R.string.interstetial_1)+"_p"))) {
-                mInterstitialAd.show();
-            } else {
-                finish();
-            }
-
-        if (Chartboost.onBackPressed())
-            return;
-        else
-            super.onBackPressed();
+        if (mInterstitialAd2.isAdLoaded()
+                && show((int) mFirebaseRemoteConfig.getLong(getString(R.string.interstetial_2) + "_p"))) {
+            mInterstitialAd2.show();
+        } else {
+            finish();
+        }
 
     }
 
@@ -554,7 +567,6 @@ public class MainActivity extends AppCompatActivity implements
             throw new RuntimeException("Could not get package name: " + e);
         }
     }
-
 
 
     public static Notification createNotification(Context cont) {
@@ -588,18 +600,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void AuthLogOut( ) {
-        final String url =Utils.getprefString(MyApplication.LOG_OUT,this);
-        final String function = "AuthLogOut" ;
+    private void AuthLogOut() {
+        final String url = Utils.getprefString(MyApplication.LOG_OUT, this);
+        final String function = "AuthLogOut";
         final String[] magic = {""};
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                       // ((MyApplication) getApplicationContext()).stopAuthService();
+                        // ((MyApplication) getApplicationContext()).stopAuthService();
 
-                        Log.d(TAG ,function+" :response :"+response);
+                        Log.d(TAG, function + " :response :" + response);
                         mApp.showToast("Logout successful");
                         onMessageEvent(new EventBusSuccess(false));
 
@@ -607,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements
                         params.putString("result", "success");
                         params.putString("context", "MainActivity");
                         mFirebaseAnalytics.logEvent("Logout", params);
-                      //  getMagic(url);
+                        //  getMagic(url);
                       /*  Log.d("MainActivity getMagic", getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response));
                         magic[0] = getRegexString("\"magic\" value=\"(?<cap>.+?)\"",response);
                         NewFirewallAuthLogin(url,magic[0]);*/
@@ -621,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements
                 params.putString("context", "MainActivity");
                 mFirebaseAnalytics.logEvent("Logout", params);
                 NetworkResponse response = error.networkResponse;
-                Log.d("MainActivity", " AuthLogOut error : "+Utils.getprefString(MyApplication.LOG_OUT,context)+"  " +error.toString());
+                Log.d("MainActivity", " AuthLogOut error : " + Utils.getprefString(MyApplication.LOG_OUT, context) + "  " + error.toString());
             }
         });
         Volley.newRequestQueue(this).add(stringRequest);
@@ -629,10 +641,10 @@ public class MainActivity extends AppCompatActivity implements
 
     public void NotificationChecker() {
         if (Utils.isNetworkAvailable(mApp)) {
-            if (!Utils.getprefBool("notifcation_login",mApp) && Utils.getprefBool(mApp.VALID_PASS,context)) {
+            if (!Utils.getprefBool("notifcation_login", mApp) && Utils.getprefBool(mApp.VALID_PASS, context)) {
                 MainActivity.createNotification(context);
 
-                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED, context)) {
                     // ((MyApplication) context.getApplicationContext()).stopAuthService();
                     mApp.startAuthService();
                 }
@@ -641,8 +653,8 @@ public class MainActivity extends AppCompatActivity implements
                 String ns = Context.NOTIFICATION_SERVICE;
                 NotificationManager nMgr = (NotificationManager) MyApplication.getContext().getSystemService(ns);
                 nMgr.cancel(1);
-                if(isNotificationVisible())
-                mApp.stopAuthService();
+                if (isNotificationVisible())
+                    mApp.stopAuthService();
                 Log.d("connected", "no_notif");
             }
         } else {
@@ -655,7 +667,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     private boolean isNotificationVisible() {
         Intent notificationIntent = new Intent(context, MainActivity.class);
         PendingIntent test = PendingIntent.getActivity(context, 1, notificationIntent, PendingIntent.FLAG_NO_CREATE);
@@ -666,8 +677,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         checkPlayServices();
-        Chartboost.onResume(this);
-
     }
 
     /**
@@ -707,18 +716,16 @@ public class MainActivity extends AppCompatActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent openNewActivity= new Intent(getApplicationContext(), SettingsActivity.class);
+            Intent openNewActivity = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(openNewActivity);
 
 
             return true;
-        }else
-        if(id == R.id.action_about){
-            Intent openNewActivity= new Intent(getApplicationContext(), AboutActivity.class);
+        } else if (id == R.id.action_about) {
+            Intent openNewActivity = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(openNewActivity);
 
-        }else
-        if (id == R.id.app_share) {
+        } else if (id == R.id.app_share) {
             Intent intent = new AppInviteInvitation.IntentBuilder("invite others to use this App")
                     .setMessage("Since the NetAccess cups frequently these days ,this app is definitely a time saver for you")
                     .setCallToActionText("Install")
@@ -750,7 +757,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void saveString(String key, String value) {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 1); // 0 - for private mode
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
         SharedPreferences.Editor editor = pref.edit();
         editor.putString(key, value);
         editor.commit();
@@ -767,11 +774,11 @@ public class MainActivity extends AppCompatActivity implements
     public static class switchButtonListener extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(Utils.getprefBool(MyApplication.NETACCESS_LOGIN,context)){
+            if (Utils.getprefBool(MyApplication.NETACCESS_LOGIN, context)) {
                 new LoginNotif().execute();
-            }else if(Utils.getprefBool(MyApplication.VALID_PASS,context)){
-                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
-                   // ((MyApplication) context.getApplicationContext()).stopAuthService();
+            } else if (Utils.getprefBool(MyApplication.VALID_PASS, context)) {
+                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED, context)) {
+                    // ((MyApplication) context.getApplicationContext()).stopAuthService();
                     ((MyApplication) context.getApplicationContext()).startAuthService();
                 }
             }
@@ -783,6 +790,7 @@ public class MainActivity extends AppCompatActivity implements
         String responseBody;
         private String resp;
         FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
         @Override
         protected String doInBackground(String... paramso) {
            /* CookieManager cookieManager = new CookieManager();
@@ -843,15 +851,15 @@ public class MainActivity extends AppCompatActivity implements
                 Vibrator v = (Vibrator) MyApplication.getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(60);
 
-                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,MyApplication.getContext())) {
-                   // ((MyApplication) MyApplication.getContext()).stopAuthService();
+                if (Utils.getprefBool(MyApplication.SERVICE_ENABLED, MyApplication.getContext())) {
+                    // ((MyApplication) MyApplication.getContext()).stopAuthService();
                     ((MyApplication) MyApplication.getContext()).startAuthService();
 
                 }
                 EventBus.getDefault().post(new EventBusSuccess(true));
                 FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(MyApplication.getContext());
 
-                if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,MyApplication.getContext())){
+                if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, MyApplication.getContext())) {
                     Bundle params = new Bundle();
                     params.putString("result", "success");
                     mFirebaseAnalytics.logEvent("Notification_Login", params);
@@ -905,7 +913,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    Utils.saveprefBool("Network_error", true,context);
+                    Utils.saveprefBool("Network_error", true, context);
 
                 }
                 try {
@@ -914,7 +922,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    Utils.saveprefBool("Network_error", true,context);
+                    Utils.saveprefBool("Network_error", true, context);
 
                 }
                 HttpUtility.disconnect();
@@ -953,7 +961,7 @@ public class MainActivity extends AppCompatActivity implements
                     test.setTextColor(Color.RED);
                     test.setText("wrong password ");
 
-                    if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,context)){
+                    if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, context)) {
                         Bundle params = new Bundle();
                         params.putString("result", "wrong password");
                         mFirebaseAnalytics.logEvent("MainActivity_Login", params);
@@ -973,20 +981,21 @@ public class MainActivity extends AppCompatActivity implements
                         test.setText("wrong password ");
                     } else {
                         onMessageEvent(new EventBusSuccess(true));
-                        if (!Utils.getprefBool("notifcation_login",context)) createNotification(MainActivity.this);
+                        if (!Utils.getprefBool("notifcation_login", context))
+                            createNotification(MainActivity.this);
 
                         test.setText(loginform.text());
                         saveString(mApp.USER_NAME, rollno.getText().toString()); // Storing string
                         saveString(mApp.LDAP_PASSWORD, ldap.getText().toString());
-                        Utils.saveprefBool(mApp.VALID_PASS, true,context);
+                        Utils.saveprefBool(mApp.VALID_PASS, true, context);
 
-                        if(Utils.getprefBool(MyApplication.ANALYTICS_ENABLED,context)){
+                        if (Utils.getprefBool(MyApplication.ANALYTICS_ENABLED, context)) {
                             Bundle params = new Bundle();
                             params.putString("result", "success");
                             mFirebaseAnalytics.logEvent("MainActivity_Login", params);
                         }
 
-                        if (Utils.getprefBool(MyApplication.SERVICE_ENABLED,context)) {
+                        if (Utils.getprefBool(MyApplication.SERVICE_ENABLED, context)) {
                             ((MyApplication) getApplicationContext()).stopAuthService();
                             ((MyApplication) getApplicationContext()).startAuthService();
                         }
@@ -1034,13 +1043,13 @@ public class MainActivity extends AppCompatActivity implements
 
 
             }
-            if (Utils.getprefBool("Network_error",context)) {
+            if (Utils.getprefBool("Network_error", context)) {
                /* t.send(new HitBuilders.EventBuilder()
                         .setCategory("Login")
                         .setAction("fail")
                         .build());*/
                 mApp.showToast("You are not connected to insti network");
-                Utils.saveprefBool("Network_error",false,context );
+                Utils.saveprefBool("Network_error", false, context);
             }
             //new Approveve().execute();
         }
@@ -1072,20 +1081,20 @@ public class MainActivity extends AppCompatActivity implements
 
         }
     }
+
     protected void showCustomDialog() {
 
 
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View dialog = inflater.inflate(R.layout.product_chat_dialog, null);
-        TextView  tvCancel,tvSend;
+        TextView tvCancel, tvSend;
 
         //final EditText editText = (EditText)dialog.findViewById(R.id.editText1);
         // cancel = (Button)dialog.findViewById(R.id.cancel);
 
         tvCancel = (TextView) dialog.findViewById(R.id.tv_cancel);
         tvSend = (TextView) dialog.findViewById(R.id.tv_send);
-
 
 
         alertDialogBuilder.setView(dialog);
@@ -1098,7 +1107,7 @@ public class MainActivity extends AppCompatActivity implements
         tvSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,context);
+                //  Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,true,context);
                 Dialog.cancel();
 
             }
@@ -1106,7 +1115,7 @@ public class MainActivity extends AppCompatActivity implements
         tvCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,false,context);
+                //  Utils.saveprefBool(MyApplication.ANALYTICS_ENABLED,false,context);
 
                 Dialog.cancel();
             }
@@ -1118,17 +1127,16 @@ public class MainActivity extends AppCompatActivity implements
 
 
         int versionCode = BuildConfig.VERSION_CODE;
-        if(mFirebaseRemoteConfig.getLong(getString(R.string.force_update_version)) > versionCode){
+        if (mFirebaseRemoteConfig.getLong(getString(R.string.force_update_version)) > versionCode) {
             final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final View dialog = inflater.inflate(R.layout.update_dialoge, null);
-            TextView  tvSend;
+            TextView tvSend;
 
             //final EditText editText = (EditText)dialog.findViewById(R.id.editText1);
             // cancel = (Button)dialog.findViewById(R.id.cancel);
 
             tvSend = (TextView) dialog.findViewById(R.id.tv_send);
-
 
 
             alertDialogBuilder.setView(dialog);
@@ -1143,7 +1151,7 @@ public class MainActivity extends AppCompatActivity implements
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("market://details?id="+getApplicationContext().getPackageName()));
+                    intent.setData(Uri.parse("market://details?id=" + getApplicationContext().getPackageName()));
                     startActivity(intent);
 
                 }
@@ -1152,8 +1160,8 @@ public class MainActivity extends AppCompatActivity implements
         }
 
 
-
     }
+
     private void fetchWelcome() {
 
         long cacheExpiration = 3600; // 1 hour in seconds.
@@ -1175,17 +1183,17 @@ public class MainActivity extends AppCompatActivity implements
                            /* Toast.makeText(MainActivity.this, "Fetch Failed",
                                     Toast.LENGTH_SHORT).show();*/
                         }
-                        Log.d(TAG,"test : "+mFirebaseRemoteConfig.getString("test"));
+                        Log.d(TAG, "test : " + mFirebaseRemoteConfig.getString("test"));
 
                     }
                 });
         // [END fetch_config_with_callback]
     }
 
-    boolean show(int value){
+    boolean show(int value) {
         Random ran = new Random();
         int x = ran.nextInt(100) + 1;
-        if(x<value) return true;
+        if (x < value) return true;
         return false;
     }
 
