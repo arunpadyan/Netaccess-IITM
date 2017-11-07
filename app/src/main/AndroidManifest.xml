@@ -8,11 +8,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <meta-data
+        android:name="firebase_crashlytics_collection_enabled"
+        android:value="false" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-
-    <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
 
     <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
 
@@ -23,17 +24,22 @@
         android:label="Firewall Login IITM"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+
         <receiver android:name=".MainActivity$switchButtonListener" />
         <receiver android:name=".MyApplication$WifiReceiver">
             <intent-filter android:priority="100">
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".MyApplication$StartService" >
+        <receiver android:name=".MyApplication$StartService">
             <intent-filter>
                 <action android:name="com.android.launchService" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -52,14 +58,17 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"/>
-        <activity android:name=".AboutActivity"/>
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+            android:label="@string/title_activity_settings" />
+        <activity android:name=".AboutActivity" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
         <service
             android:name=".AuthService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
 
     </application>
 

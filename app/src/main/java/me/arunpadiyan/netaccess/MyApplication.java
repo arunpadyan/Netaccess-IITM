@@ -16,11 +16,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
+import com.android.volley.*;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MyApplication extends Application {
     public static final String FORCE_LOGIN = "force_login";
@@ -62,6 +65,9 @@ public class MyApplication extends Application {
 
         mContext = this;
         initFirebase();
+        if(!BuildConfig.DEBUG)
+            Fabric.with(this, new Crashlytics());
+
 
 
     }
